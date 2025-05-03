@@ -1,21 +1,37 @@
 # LogHog
 
-**TODO: Add description**
+[LogHog Error Tracking](https://posthog.com/docs/error-tracking) for Elixir
 
-## Installation
+> #### WIP {: .warning}
+>
+> The library is a work in progress! Don't use it yet.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `log_hog` to your list of dependencies in `mix.exs`:
+
+What works:
+* Sending basic log message to the server
+
+What doesn't work:
+* Everything else (metadata, stacktraces, batching, etc.)
+
+
+## Getting Started
+
+Add `LogHog` to the deps:
 
 ```elixir
 def deps do
   [
-    {:log_hog, "~> 0.1.0"}
+    {:log_hog, "~> 0.0.1"}
   ]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/log_hog>.
+Configure `LogHog` Application environment:
 
+```elixir
+config :log_hog,
+  public_url: "https://us.i.posthog.com",
+  api_key: "my_api_key"
+```
+
+Alternatively, you can attach `LogHog.Handler` yourself.

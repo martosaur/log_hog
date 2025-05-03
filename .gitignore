@@ -21,3 +21,7 @@ log_hog-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# Dev & Integration Configs
+config/dev.exs
+config/integration.exs

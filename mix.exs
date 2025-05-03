@@ -1,28 +1,62 @@
 defmodule LogHog.MixProject do
   use Mix.Project
 
+  @version "0.0.1"
+  @source_url "https://github.com/martosaur/log_hog"
+
   def project do
     [
       app: :log_hog,
-      version: "0.1.0",
+      version: @version,
       elixir: "~> 1.18",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      docs: docs(),
+      package: package()
     ]
   end
 
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
+      mod: {LogHog.Application, []},
       extra_applications: [:logger]
+    ]
+  end
+
+  defp elixirc_paths(:test), do: ["test/support", "lib"]
+  defp elixirc_paths(_env), do: ["lib"]
+
+  defp package do
+    [
+      description: "PostHog Error Tracking for Elixir",
+      licenses: ["MIT"],
+      links: %{
+        "GitHub" => @source_url
+      }
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      source_url: @source_url,
+      source_ref: "v#{@version}",
+      extras: [
+        "README.md"
+      ]
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:nimble_options, "~> 1.1"},
+      {:req, "~> 0.5.10"},
+      {:logger_handler_kit, "~> 0.1", only: :test},
+      {:mox, "~> 1.1", only: :test},
+      {:ex_doc, "~> 0.37", only: :dev, runtime: false}
     ]
   end
 end
