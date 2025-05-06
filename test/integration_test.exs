@@ -32,4 +32,20 @@ defmodule LogHog.IntegrationTest do
   test "task exit" do
     LoggerHandlerKit.Act.task_error(:exit)
   end
+
+  test "supervisor report" do
+    Application.stop(:logger)
+    Application.put_env(:logger, :handle_sasl_reports, true)
+    Application.put_env(:logger, :level, :info)
+    Application.start(:logger)
+
+    on_exit(fn ->
+      Application.stop(:logger)
+      Application.put_env(:logger, :handle_sasl_reports, false)
+      Application.delete_env(:logger, :level)
+      Application.start(:logger)
+    end)
+
+    LoggerHandlerKit.Act.supervisor_progress_report(:failed_to_start_child)
+  end
 end

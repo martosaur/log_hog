@@ -11,7 +11,7 @@ defmodule LogHog.HandlerTest do
 
   setup :verify_on_exit!
 
-  setup %{test: test} do
+  setup %{test: test} = context do
     stub_with(API.Mock, API.Stub)
 
     config =
@@ -21,11 +21,14 @@ defmodule LogHog.HandlerTest do
         api_client_module: LogHog.API.Mock
       )
 
+    big_config_override = Map.take(context, [:handle_otp_reports, :handle_sasl_reports, :level])
+
     {context, on_exit} =
       LoggerHandlerKit.Arrange.add_handler(
         test,
         LogHog.Handler,
-        config
+        config,
+        big_config_override
       )
 
     on_exit(on_exit)
@@ -45,8 +48,7 @@ defmodule LogHog.HandlerTest do
                    %{
                      type: "Hello World",
                      value: "Hello World",
-                     mechanism: %{handled: true, type: "generic"},
-                     stacktrace: %{}
+                     mechanism: %{handled: true, type: "generic"}
                    }
                  ]
                }
@@ -700,6 +702,208 @@ defmodule LogHog.HandlerTest do
     end)
 
     LoggerHandlerKit.Act.bare_process_crash(handler_id, :throw)
+    LoggerHandlerKit.Assert.assert_logged(ref)
+  end
+
+  @tag handle_sasl_reports: true
+  test "genserver init crash", %{handler_ref: ref} do
+    expect(API.Mock, :request, fn _client, method, url, opts ->
+      assert method == :post
+      assert url == "/i/v0/e"
+
+      assert %{
+               event: "$exception",
+               properties: %{
+                 "$exception_list": [
+                   %{
+                     type: "** (RuntimeError) oops",
+                     value: "** (RuntimeError) oops",
+                     mechanism: %{handled: true, type: "generic"},
+                     stacktrace: %{
+                       frames: [
+                         %{
+                           filename: "lib/logger_handler_kit/act.ex",
+                           function:
+                             "anonymous fn/0 in LoggerHandlerKit.Act.genserver_init_crash/0",
+                           in_app: true,
+                           lineno: _,
+                           module: "LoggerHandlerKit.Act",
+                           platform: "python"
+                         },
+                         %{
+                           filename: "gen_server.erl",
+                           function: ":gen_server.init_it/2",
+                           in_app: true,
+                           lineno: _,
+                           module: ":gen_server",
+                           platform: "python"
+                         },
+                         %{
+                           filename: "gen_server.erl",
+                           function: ":gen_server.init_it/6",
+                           in_app: true,
+                           lineno: _,
+                           module: ":gen_server",
+                           platform: "python"
+                         },
+                         %{
+                           filename: "proc_lib.erl",
+                           function: ":proc_lib.init_p_do_apply/3",
+                           in_app: true,
+                           lineno: _,
+                           module: ":proc_lib",
+                           platform: "python"
+                         }
+                       ],
+                       type: "raw"
+                     }
+                   }
+                 ]
+               }
+             } = opts[:json]
+
+      {:ok, %{}}
+    end)
+
+    LoggerHandlerKit.Act.genserver_init_crash()
+    LoggerHandlerKit.Assert.assert_logged(ref)
+  end
+
+  @tag handle_sasl_reports: true
+  test "proc_lib crash exception", %{handler_ref: ref} do
+    expect(API.Mock, :request, fn _client, method, url, opts ->
+      assert method == :post
+      assert url == "/i/v0/e"
+
+      assert %{
+               event: "$exception",
+               properties: %{
+                 "$exception_list": [
+                   %{
+                     type: "** (RuntimeError) oops",
+                     value: "** (RuntimeError) oops",
+                     mechanism: %{handled: true, type: "generic"},
+                     stacktrace: %{
+                       frames: [
+                         %{
+                           filename: "lib/logger_handler_kit/act.ex",
+                           function: "anonymous fn/1 in LoggerHandlerKit.Act.proc_lib_crash/1",
+                           in_app: true,
+                           lineno: _,
+                           module: "LoggerHandlerKit.Act",
+                           platform: "python"
+                         },
+                         %{
+                           filename: "proc_lib.erl",
+                           function: ":proc_lib.init_p/3",
+                           in_app: true,
+                           lineno: _,
+                           module: ":proc_lib",
+                           platform: "python"
+                         }
+                       ],
+                       type: "raw"
+                     }
+                   }
+                 ]
+               }
+             } = opts[:json]
+
+      {:ok, %{}}
+    end)
+
+    LoggerHandlerKit.Act.proc_lib_crash(:exception)
+    LoggerHandlerKit.Assert.assert_logged(ref)
+  end
+
+  @tag handle_sasl_reports: true
+  test "supervisor progress report failed to start child", %{handler_ref: ref} do
+    expect(API.Mock, :request, fn _client, method, url, opts ->
+      assert method == :post
+      assert url == "/i/v0/e"
+
+      assert %{
+               event: "$exception",
+               properties: %{
+                 "$exception_list": [
+                   %{
+                     type: "Child :task of Supervisor" <> type_end,
+                     value: "Child :task of Supervisor" <> value_end,
+                     mechanism: %{handled: true, type: "generic"}
+                   }
+                 ]
+               }
+             } = opts[:json]
+
+      assert String.ends_with?(type_end, "failed to start")
+      assert String.ends_with?(value_end, "\nType: :worker")
+
+      {:ok, %{}}
+    end)
+
+    LoggerHandlerKit.Act.supervisor_progress_report(:failed_to_start_child)
+    LoggerHandlerKit.Assert.assert_logged(ref)
+  end
+
+  @tag handle_sasl_reports: true
+  test "supervisor progress report child started", %{handler_ref: ref} do
+    expect(API.Mock, :request, fn _client, method, url, opts ->
+      assert method == :post
+      assert url == "/i/v0/e"
+
+      assert %{
+               event: "$exception",
+               properties: %{
+                 "$exception_list": [
+                   %{
+                     type: "Child :task of Supervisor" <> type_end,
+                     value: "Child :task of Supervisor" <> value_end,
+                     mechanism: %{handled: true, type: "generic"}
+                   }
+                 ]
+               }
+             } = opts[:json]
+
+      assert String.ends_with?(type_end, "started")
+      assert String.ends_with?(value_end, "\nType: :worker")
+
+      {:ok, %{}}
+    end)
+
+    LoggerHandlerKit.Act.supervisor_progress_report(:child_started)
+    LoggerHandlerKit.Assert.assert_logged(ref)
+  end
+
+  @tag handle_sasl_reports: true
+  test "supervisor progress report child terminated", %{handler_ref: ref} do
+    expect(API.Mock, :request, 3, fn _client, method, url, opts ->
+      assert method == :post
+      assert url == "/i/v0/e"
+
+      assert %{
+               event: "$exception",
+               properties: %{
+                 "$exception_list": [
+                   %{
+                     type: "Child :task of Supervisor" <> type_end,
+                     mechanism: %{handled: true, type: "generic"}
+                   }
+                 ]
+               }
+             } = opts[:json]
+
+      assert Enum.any?([
+               String.ends_with?(type_end, "started"),
+               String.ends_with?(type_end, "terminated"),
+               String.ends_with?(type_end, "caused shutdown")
+             ])
+
+      {:ok, %{}}
+    end)
+
+    LoggerHandlerKit.Act.supervisor_progress_report(:child_terminated)
+    LoggerHandlerKit.Assert.assert_logged(ref)
+    LoggerHandlerKit.Assert.assert_logged(ref)
     LoggerHandlerKit.Assert.assert_logged(ref)
   end
 end
