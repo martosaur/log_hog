@@ -20,8 +20,6 @@ defmodule LogHog.Handler do
     :ok
   end
 
-  def type(%{msg: {:string, chardata}}), do: IO.iodata_to_binary(chardata)
-
   def type(%{meta: %{crash_reason: {reason, _}}}) when is_exception(reason),
     do: Exception.format_banner(:error, reason)
 
@@ -30,6 +28,8 @@ defmodule LogHog.Handler do
 
   def type(%{meta: %{crash_reason: {reason, _}}}),
     do: Exception.format_banner(:exit, reason)
+
+  def type(%{msg: {:string, chardata}}), do: IO.iodata_to_binary(chardata)
 
   def type(%{msg: {:report, report}}), do: inspect(report)
 
@@ -57,7 +57,7 @@ defmodule LogHog.Handler do
   def value(%{msg: {io_format, data}}),
     do: io_format |> :io_lib.format(data) |> IO.iodata_to_binary()
 
-  def stacktrace(%{meta: %{crash_reason: {_reason, stacktrace}}}) do
+  def stacktrace(%{meta: %{crash_reason: {_reason, [_ | _] = stacktrace}}}) do
     frames =
       for {module, function, arity_or_args, location} <- stacktrace do
         %{

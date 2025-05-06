@@ -458,4 +458,248 @@ defmodule LogHog.HandlerTest do
     LoggerHandlerKit.Act.genserver_crash(:exception)
     LoggerHandlerKit.Assert.assert_logged(ref)
   end
+
+  test "genserver crash exit", %{handler_ref: ref} do
+    expect(API.Mock, :request, fn _client, method, url, opts ->
+      assert method == :post
+      assert url == "/i/v0/e"
+
+      assert %{
+               event: "$exception",
+               properties: %{
+                 "$exception_list": [
+                   %{
+                     type: "** (exit) \"i quit\"",
+                     value: "** (exit) \"i quit\"",
+                     mechanism: %{handled: true, type: "generic"},
+                     stacktrace: %{
+                       type: "raw",
+                       frames: [
+                         %{
+                           in_app: true,
+                           filename: "lib/logger_handler_kit/act.ex",
+                           function: "anonymous fn/0 in LoggerHandlerKit.Act.genserver_crash/1",
+                           lineno: _,
+                           module: "LoggerHandlerKit.Act",
+                           platform: "python"
+                         },
+                         %{
+                           filename: "gen_server.erl",
+                           function: ":gen_server.try_handle_call/4",
+                           in_app: true,
+                           lineno: _,
+                           module: ":gen_server",
+                           platform: "python"
+                         },
+                         %{
+                           filename: "gen_server.erl",
+                           function: ":gen_server.handle_msg/6",
+                           in_app: true,
+                           lineno: _,
+                           module: ":gen_server",
+                           platform: "python"
+                         },
+                         %{
+                           filename: "proc_lib.erl",
+                           function: ":proc_lib.init_p_do_apply/3",
+                           in_app: true,
+                           lineno: _,
+                           module: ":proc_lib",
+                           platform: "python"
+                         }
+                       ]
+                     }
+                   }
+                 ]
+               }
+             } = opts[:json]
+
+      {:ok, %{}}
+    end)
+
+    LoggerHandlerKit.Act.genserver_crash(:exit)
+    LoggerHandlerKit.Assert.assert_logged(ref)
+  end
+
+  test "genserver crash exit with struct", %{handler_ref: ref} do
+    expect(API.Mock, :request, fn _client, method, url, opts ->
+      assert method == :post
+      assert url == "/i/v0/e"
+
+      assert %{
+               event: "$exception",
+               properties: %{
+                 "$exception_list": [
+                   %{
+                     type: "** (exit) %LoggerHandlerKit.FakeStruct{hello: \"world\"}",
+                     value: "** (exit) %LoggerHandlerKit.FakeStruct{hello: \"world\"}",
+                     mechanism: %{handled: true, type: "generic"}
+                   }
+                 ]
+               }
+             } = opts[:json]
+
+      {:ok, %{}}
+    end)
+
+    LoggerHandlerKit.Act.genserver_crash(:exit_with_struct)
+    LoggerHandlerKit.Assert.assert_logged(ref)
+  end
+
+  test "genserver crash throw", %{handler_ref: ref} do
+    expect(API.Mock, :request, fn _client, method, url, opts ->
+      assert method == :post
+      assert url == "/i/v0/e"
+
+      assert %{
+               event: "$exception",
+               properties: %{
+                 "$exception_list": [
+                   %{
+                     type: "** (exit) bad return value: \"catch!\"",
+                     value: "** (exit) bad return value: \"catch!\"",
+                     mechanism: %{handled: true, type: "generic"}
+                   }
+                 ]
+               }
+             } = opts[:json]
+
+      {:ok, %{}}
+    end)
+
+    LoggerHandlerKit.Act.genserver_crash(:throw)
+    LoggerHandlerKit.Assert.assert_logged(ref)
+  end
+
+  test "gen_state_m crash exception", %{handler_ref: ref} do
+    expect(API.Mock, :request, fn _client, method, url, opts ->
+      assert method == :post
+      assert url == "/i/v0/e"
+
+      assert %{
+               event: "$exception",
+               properties: %{
+                 "$exception_list": [
+                   %{
+                     type: "** (RuntimeError) oops",
+                     value: "** (RuntimeError) oops",
+                     mechanism: %{handled: true, type: "generic"},
+                     stacktrace: %{
+                       frames: [
+                         %{
+                           function: "anonymous fn/0 in LoggerHandlerKit.Act.gen_statem_crash/1",
+                           module: "LoggerHandlerKit.Act",
+                           filename: "lib/logger_handler_kit/act.ex",
+                           in_app: true,
+                           lineno: _,
+                           platform: "python"
+                         },
+                         %{
+                           function: ":gen_statem.loop_state_callback/11",
+                           module: ":gen_statem",
+                           filename: "gen_statem.erl",
+                           in_app: true,
+                           lineno: _,
+                           platform: "python"
+                         },
+                         %{
+                           function: ":proc_lib.init_p_do_apply/3",
+                           module: ":proc_lib",
+                           filename: "proc_lib.erl",
+                           in_app: true,
+                           lineno: _,
+                           platform: "python"
+                         }
+                       ],
+                       type: "raw"
+                     }
+                   }
+                 ]
+               }
+             } = opts[:json]
+
+      {:ok, %{}}
+    end)
+
+    LoggerHandlerKit.Act.gen_statem_crash(:exception)
+    LoggerHandlerKit.Assert.assert_logged(ref)
+  end
+
+  test "bare process crash exception", %{handler_id: handler_id, handler_ref: ref} do
+    expect(API.Mock, :request, fn _client, method, url, opts ->
+      assert method == :post
+      assert url == "/i/v0/e"
+
+      assert %{
+               event: "$exception",
+               properties: %{
+                 "$exception_list": [
+                   %{
+                     type: "** (RuntimeError) oops",
+                     value: "** (RuntimeError) oops",
+                     mechanism: %{handled: true, type: "generic"},
+                     stacktrace: %{
+                       frames: [
+                         %{
+                           filename: "lib/logger_handler_kit/act.ex",
+                           function:
+                             "anonymous fn/0 in LoggerHandlerKit.Act.bare_process_crash/2",
+                           in_app: true,
+                           lineno: _,
+                           module: "LoggerHandlerKit.Act",
+                           platform: "python"
+                         }
+                       ],
+                       type: "raw"
+                     }
+                   }
+                 ]
+               }
+             } = opts[:json]
+
+      {:ok, %{}}
+    end)
+
+    LoggerHandlerKit.Act.bare_process_crash(handler_id, :exception)
+    LoggerHandlerKit.Assert.assert_logged(ref)
+  end
+
+  test "bare process crash throw", %{handler_id: handler_id, handler_ref: ref} do
+    expect(API.Mock, :request, fn _client, method, url, opts ->
+      assert method == :post
+      assert url == "/i/v0/e"
+
+      assert %{
+               event: "$exception",
+               properties: %{
+                 "$exception_list": [
+                   %{
+                     type: "** (ErlangError) Erlang error: {:nocatch, \"catch!\"}",
+                     value: "** (ErlangError) Erlang error: {:nocatch, \"catch!\"}",
+                     mechanism: %{handled: true, type: "generic"},
+                     stacktrace: %{
+                       frames: [
+                         %{
+                           filename: "lib/logger_handler_kit/act.ex",
+                           function:
+                             "anonymous fn/0 in LoggerHandlerKit.Act.bare_process_crash/2",
+                           in_app: true,
+                           lineno: _,
+                           module: "LoggerHandlerKit.Act",
+                           platform: "python"
+                         }
+                       ],
+                       type: "raw"
+                     }
+                   }
+                 ]
+               }
+             } = opts[:json]
+
+      {:ok, %{}}
+    end)
+
+    LoggerHandlerKit.Act.bare_process_crash(handler_id, :throw)
+    LoggerHandlerKit.Assert.assert_logged(ref)
+  end
 end
