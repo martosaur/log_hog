@@ -1,6 +1,6 @@
 # LogHog
 
-[LogHog Error Tracking](https://posthog.com/docs/error-tracking) for Elixir
+[PostHog Error Tracking](https://posthog.com/docs/error-tracking) for Elixir
 
 > #### WIP {: .warning}
 >
