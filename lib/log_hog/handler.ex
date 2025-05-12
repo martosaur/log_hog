@@ -1,8 +1,6 @@
 defmodule LogHog.Handler do
   @behaviour :logger_handler
 
-  alias LogHog.API
-
   @impl :logger_handler
   def log(event, %{config: config}) do
     exception =
@@ -14,10 +12,15 @@ defmodule LogHog.Handler do
         end
       )
 
-    API.post_exception(config.api_client, %{
-      distinct_id: get_in(event, [:meta, :distinct_id]) || "unknown",
-      "$exception_list": [exception]
-    })
+    event = %{
+      event: "$exception",
+      properties: %{
+        distinct_id: get_in(event, [:meta, :distinct_id]) || "unknown",
+        "$exception_list": [exception]
+      }
+    }
+
+    LogHog.Sender.send(event, config.supervisor_name)
 
     :ok
   end

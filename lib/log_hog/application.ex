@@ -4,10 +4,17 @@ defmodule LogHog.Application do
   use Application
 
   def start(_type, _args) do
-    with %{} = config <- LogHog.Config.read!() do
-      :logger.add_handler(:log_hog, LogHog.Handler, %{config: config})
-    end
+    children =
+      case LogHog.Config.read!() do
+        %{} = config ->
+          :logger.add_handler(:log_hog, LogHog.Handler, %{config: config})
 
-    Supervisor.start_link([], strategy: :one_for_one, name: __MODULE__)
+          [{LogHog.Supervisor, config}]
+
+        :missing_config ->
+          []
+      end
+
+    Supervisor.start_link(children, strategy: :one_for_one, name: __MODULE__)
   end
 end

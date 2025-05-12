@@ -10,30 +10,48 @@ defmodule LogHog.IntegrationTest do
     {:ok, config} =
       Application.fetch_env!(:log_hog, :integration_config) |> LogHog.Config.validate()
 
+    start_link_supervised!({LogHog.Supervisor, config})
+
+    wait = fn ->
+      sender_pid =
+        config.supervisor_name
+        |> LogHog.Registry.via(LogHog.Sender)
+        |> GenServer.whereis()
+
+      send(sender_pid, :batch_time_reached)
+      :sys.get_status(sender_pid)
+    end
+
     :logger.add_handler(:log_hog, LogHog.Handler, %{config: config})
+
+    %{wait_fun: wait}
   end
 
   setup %{test: test} do
     Logger.metadata(distinct_id: test)
   end
 
-  test "log message" do
+  test "log message", %{wait_fun: wait} do
     Logger.info("Hello World!")
+    wait.()
   end
 
-  test "task exception" do
+  test "task exception", %{wait_fun: wait} do
     LoggerHandlerKit.Act.task_error(:exception)
+    wait.()
   end
 
-  test "task throw" do
+  test "task throw", %{wait_fun: wait} do
     LoggerHandlerKit.Act.task_error(:throw)
+    wait.()
   end
 
-  test "task exit" do
+  test "task exit", %{wait_fun: wait} do
     LoggerHandlerKit.Act.task_error(:exit)
+    wait.()
   end
 
-  test "supervisor report" do
+  test "supervisor report", %{wait_fun: wait} do
     Application.stop(:logger)
     Application.put_env(:logger, :handle_sasl_reports, true)
     Application.put_env(:logger, :level, :info)
@@ -47,5 +65,6 @@ defmodule LogHog.IntegrationTest do
     end)
 
     LoggerHandlerKit.Act.supervisor_progress_report(:failed_to_start_child)
+    wait.()
   end
 end

@@ -14,6 +14,11 @@ defmodule LogHog.Config do
       type: :atom,
       default: LogHog.API.Client,
       doc: "API Client to use"
+    ],
+    supervisor_name: [
+      type: :atom,
+      default: LogHog,
+      doc: "Name of the supervisor process running LogHog"
     ]
   ]
 
