@@ -51,6 +51,12 @@ defmodule LogHog.IntegrationTest do
     wait.()
   end
 
+  test "exports metadata", %{wait_fun: wait} do
+    LoggerHandlerKit.Act.metadata_serialization(:all)
+    Logger.error("Error with metadata")
+    wait.()
+  end
+
   test "supervisor report", %{wait_fun: wait} do
     Application.stop(:logger)
     Application.put_env(:logger, :handle_sasl_reports, true)

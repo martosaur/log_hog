@@ -54,7 +54,8 @@ defmodule LogHog.MixProject do
     [
       {:nimble_options, "~> 1.1"},
       {:req, "~> 0.5.10"},
-      {:logger_handler_kit, "~> 0.1", only: :test},
+      {:logger_json, "~> 7.0"},
+      {:logger_handler_kit, "~> 0.2", only: :test},
       {:mox, "~> 1.1", only: :test},
       {:ex_doc, "~> 0.37", only: :dev, runtime: false}
     ]
