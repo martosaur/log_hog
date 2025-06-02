@@ -18,6 +18,7 @@ defmodule LogHog.HandlerTest do
         api_client_module: LogHog.API.Mock,
         supervisor_name: test
       ]
+      |> Keyword.merge(context[:config] || [])
       |> LogHog.Config.validate!()
       |> Map.put(:max_batch_time_ms, to_timeout(60_000))
       |> Map.put(:max_batch_events, 100)
@@ -800,5 +801,65 @@ defmodule LogHog.HandlerTest do
                String.ends_with?(type_end, "caused shutdown")
              ])
     end
+  end
+
+  @tag config: [metadata: [:extra]]
+  test "exports metadata if configured", %{handler_ref: ref, sender_pid: sender_pid} do
+    Logger.error("Error with metadata", extra: "Foo", hello: "world")
+    LoggerHandlerKit.Assert.assert_logged(ref)
+
+    assert %{events: [event]} = :sys.get_state(sender_pid)
+
+    assert %{
+             event: "$exception",
+             properties: %{
+               extra: "Foo",
+               "$exception_list": [
+                 %{
+                   type: "Error with metadata",
+                   value: "Error with metadata",
+                   mechanism: %{handled: true}
+                 }
+               ]
+             }
+           } = event
+  end
+
+  @tag config: [metadata: [:extra]]
+  test "ensures metadata is serializable", %{handler_ref: ref, sender_pid: sender_pid} do
+    LoggerHandlerKit.Act.metadata_serialization(:all)
+    LoggerHandlerKit.Act.string_message()
+    LoggerHandlerKit.Assert.assert_logged(ref)
+
+    assert %{events: [event]} = :sys.get_state(sender_pid)
+
+    assert %{
+             event: "$exception",
+             properties: %{extra: maybe_encoded}
+           } = event
+
+    assert %{
+             boolean: true,
+             string: "hello world",
+             binary: "<<1, 2, 3>>",
+             atom: :foo,
+             integer: 42,
+             datetime: ~U[2025-06-01 12:34:56.000Z],
+             struct: %{hello: "world"},
+             tuple: [:ok, "hello"],
+             keyword: %{hello: "world"},
+             improper_keyword: "[[:a, 1] | {:b, 2}]",
+             fake_keyword: [[:a, 1], [:b, 2, :c]],
+             list: [1, 2, 3],
+             improper_list: "[1, 2 | 3]",
+             map: %{:hello => "world", "foo" => "bar"},
+             function: "&LoggerHandlerKit.Act.metadata_serialization/1",
+             anonymous_function: "#Function<" <> _,
+             pid: "#PID<" <> _,
+             ref: "#Reference<" <> _,
+             port: "#Port<" <> _
+           } = maybe_encoded
+
+    JSON.encode!(maybe_encoded)
   end
 end

@@ -19,6 +19,11 @@ defmodule LogHog.Config do
       type: :atom,
       default: LogHog,
       doc: "Name of the supervisor process running LogHog"
+    ],
+    metadata: [
+      type: {:list, :atom},
+      default: [],
+      doc: "List of metadata keys to include in event properties"
     ]
   ]
 

@@ -12,12 +12,22 @@ defmodule LogHog.Handler do
         end
       )
 
+    metadata =
+      event.meta
+      |> Map.take([:distinct_id | config.metadata])
+      |> Map.drop(["$exception_list"])
+      |> LoggerJSON.Formatter.RedactorEncoder.encode([])
+
     event = %{
       event: "$exception",
-      properties: %{
-        distinct_id: get_in(event, [:meta, :distinct_id]) || "unknown",
-        "$exception_list": [exception]
-      }
+      properties:
+        Map.merge(
+          %{
+            distinct_id: "unknown",
+            "$exception_list": [exception]
+          },
+          metadata
+        )
     }
 
     LogHog.Sender.send(event, config.supervisor_name)
