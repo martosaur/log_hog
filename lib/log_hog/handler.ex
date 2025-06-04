@@ -61,7 +61,12 @@ defmodule LogHog.Handler do
   defp type(%{meta: %{crash_reason: {reason, _}}}),
     do: %{type: Exception.format_banner(:exit, reason)}
 
-  defp type(%{msg: {:string, chardata}}), do: %{type: IO.iodata_to_binary(chardata)}
+  defp type(%{msg: {:string, chardata}}) do
+    chardata
+    |> IO.iodata_to_binary()
+    |> String.split("\n")
+    |> then(fn [type | _] -> %{type: type} end)
+  end
 
   defp type(%{msg: {:report, report}, meta: %{report_cb: report_cb}})
        when is_function(report_cb, 1) do
@@ -88,13 +93,14 @@ defmodule LogHog.Handler do
   defp value(%{meta: %{crash_reason: {reason, stacktrace}}}),
     do: %{value: Exception.format_banner(:exit, reason, stacktrace)}
 
+  defp value(%{msg: {:string, chardata}}), do: %{value: IO.iodata_to_binary(chardata)}
+
   defp value(%{msg: {:report, report}, meta: %{report_cb: report_cb}})
        when is_function(report_cb, 1) do
     {io_format, data} = report_cb.(report)
     io_format |> :io_lib.format(data) |> IO.iodata_to_binary() |> then(&%{value: &1})
   end
 
-  defp value(%{msg: {:string, chardata}}), do: %{value: IO.iodata_to_binary(chardata)}
   defp value(%{msg: {:report, report}}), do: %{value: inspect(report)}
 
   defp value(%{msg: {io_format, data}}),
