@@ -52,37 +52,37 @@ defmodule LogHog.Handler do
     }
   end
 
-  defp type(%{meta: %{crash_reason: {reason, _}}}) when is_exception(reason),
-    do: %{type: Exception.format_banner(:error, reason)}
-
-  defp type(%{meta: %{crash_reason: {{:nocatch, throw}, _}}}),
-    do: %{type: Exception.format_banner(:throw, throw)}
-
-  defp type(%{meta: %{crash_reason: {reason, _}}}),
-    do: %{type: Exception.format_banner(:exit, reason)}
-
-  defp type(%{msg: {:string, chardata}}) do
-    chardata
-    |> IO.iodata_to_binary()
+  defp type(log_event) do
+    log_event
+    |> do_type()
     |> String.split("\n")
     |> then(fn [type | _] -> %{type: type} end)
   end
 
-  defp type(%{msg: {:report, report}, meta: %{report_cb: report_cb}})
+  defp do_type(%{meta: %{crash_reason: {reason, _}}}) when is_exception(reason),
+    do: Exception.format_banner(:error, reason)
+
+  defp do_type(%{meta: %{crash_reason: {{:nocatch, throw}, _}}}),
+    do: Exception.format_banner(:throw, throw)
+
+  defp do_type(%{meta: %{crash_reason: {reason, _}}}),
+    do: Exception.format_banner(:exit, reason)
+
+  defp do_type(%{msg: {:string, chardata}}), do: IO.iodata_to_binary(chardata)
+
+  defp do_type(%{msg: {:report, report}, meta: %{report_cb: report_cb}})
        when is_function(report_cb, 1) do
     {io_format, data} = report_cb.(report)
 
     io_format
     |> :io_lib.format(data)
     |> IO.iodata_to_binary()
-    |> String.split("\n")
-    |> then(fn [type | _] -> %{type: type} end)
   end
 
-  defp type(%{msg: {:report, report}}), do: %{type: inspect(report)}
+  defp do_type(%{msg: {:report, report}}), do: inspect(report)
 
-  defp type(%{msg: {io_format, data}}),
-    do: io_format |> :io_lib.format(data) |> IO.iodata_to_binary() |> then(&%{type: &1})
+  defp do_type(%{msg: {io_format, data}}),
+    do: io_format |> :io_lib.format(data) |> IO.iodata_to_binary()
 
   defp value(%{meta: %{crash_reason: {reason, stacktrace}}}) when is_exception(reason),
     do: %{value: Exception.format_banner(:error, reason, stacktrace)}
@@ -111,7 +111,7 @@ defmodule LogHog.Handler do
       for {module, function, arity_or_args, location} <- stacktrace do
         %{
           lineno: Keyword.get(location, :line),
-          filename: Keyword.get(location, :file) |> IO.chardata_to_string(),
+          filename: Keyword.get(location, :file, []) |> IO.chardata_to_string(),
           function: Exception.format_mfa(module, function, arity_or_args),
           module: inspect(module),
           in_app: true,

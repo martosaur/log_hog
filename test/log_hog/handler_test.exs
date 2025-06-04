@@ -893,4 +893,39 @@ defmodule LogHog.HandlerTest do
 
     JSON.encode!(maybe_encoded)
   end
+
+  test "erlang frames in stacktrace", %{handler_ref: ref, sender_pid: sender_pid} do
+    {:ok, _pid} = Task.start(fn -> :erlang.system_time(:foo) end)
+    LoggerHandlerKit.Assert.assert_logged(ref)
+
+    assert %{events: [event]} = :sys.get_state(sender_pid)
+
+    assert %{
+             event: "$exception",
+             properties: %{
+               "$exception_list": [
+                 %{
+                   type: "** (ArgumentError) errors were found at the given arguments:",
+                   value:
+                     "** (ArgumentError) errors were found at the given arguments:\n\n  * 1st argument: invalid time unit\n",
+                   stacktrace: %{
+                     type: "raw",
+                     frames: [
+                       %{
+                         filename: "",
+                         function: ":erlang.system_time(:foo)",
+                         in_app: true,
+                         lineno: nil,
+                         module: ":erlang",
+                         platform: "python"
+                       }
+                       | _
+                     ]
+                   },
+                   mechanism: %{type: "generic", handled: true}
+                 }
+               ]
+             }
+           } = event
+  end
 end
