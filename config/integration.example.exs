@@ -3,4 +3,5 @@ import Config
 config :log_hog, :integration_config,
   public_url: "https://us.i.posthog.com",
   api_key: "my key",
-  metadata: [:extra]
+  metadata: [:extra],
+  capture_level: :info

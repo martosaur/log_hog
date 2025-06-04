@@ -2,23 +2,41 @@ defmodule LogHog.Handler do
   @behaviour :logger_handler
 
   @impl :logger_handler
-  def log(event, %{config: config}) do
+  def log(log_event, %{config: config}) do
+    cond do
+      get_in(log_event, [:meta, :crash_reason]) ->
+        event = to_event(log_event, config)
+        LogHog.Sender.send(event, config.supervisor_name)
+
+      is_nil(config.capture_level) ->
+        :ok
+
+      Logger.compare_levels(log_event.level, config.capture_level) in [:gt, :eq] ->
+        event = to_event(log_event, config)
+        LogHog.Sender.send(event, config.supervisor_name)
+
+      true ->
+        :ok
+    end
+  end
+
+  def to_event(log_event, config) do
     exception =
       Enum.reduce(
         [&type/1, &value/1, &stacktrace/1],
         %{mechanism: %{handled: true, type: "generic"}},
         fn fun, acc ->
-          Map.merge(acc, fun.(event))
+          Map.merge(acc, fun.(log_event))
         end
       )
 
     metadata =
-      event.meta
+      log_event.meta
       |> Map.take([:distinct_id | config.metadata])
       |> Map.drop(["$exception_list"])
       |> LoggerJSON.Formatter.RedactorEncoder.encode([])
 
-    event = %{
+    %{
       event: "$exception",
       properties:
         Map.merge(
@@ -29,10 +47,6 @@ defmodule LogHog.Handler do
           metadata
         )
     }
-
-    LogHog.Sender.send(event, config.supervisor_name)
-
-    :ok
   end
 
   def type(%{meta: %{crash_reason: {reason, _}}}) when is_exception(reason),

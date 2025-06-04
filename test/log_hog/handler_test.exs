@@ -16,7 +16,8 @@ defmodule LogHog.HandlerTest do
         public_url: "https://us.i.posthog.com",
         api_key: "my_api_key",
         api_client_module: LogHog.API.Mock,
-        supervisor_name: test
+        supervisor_name: test,
+        capture_level: :info
       ]
       |> Keyword.merge(context[:config] || [])
       |> LogHog.Config.validate!()
@@ -54,6 +55,36 @@ defmodule LogHog.HandlerTest do
                  %{
                    type: "Hello World",
                    value: "Hello World",
+                   mechanism: %{handled: true, type: "generic"}
+                 }
+               ]
+             }
+           }
+  end
+
+  @tag config: [capture_level: :warning]
+  test "ignores messages lower than capture_level", %{handler_ref: ref, sender_pid: sender_pid} do
+    Logger.info("Hello World")
+    LoggerHandlerKit.Assert.assert_logged(ref)
+
+    assert %{events: []} = :sys.get_state(sender_pid)
+  end
+
+  @tag config: [capture_level: :warning]
+  test "logs with crash reason always captured", %{handler_ref: ref, sender_pid: sender_pid} do
+    Logger.debug("Hello World", crash_reason: {"exit reason", []})
+    LoggerHandlerKit.Assert.assert_logged(ref)
+
+    assert %{events: [event]} = :sys.get_state(sender_pid)
+
+    assert event == %{
+             event: "$exception",
+             properties: %{
+               distinct_id: "unknown",
+               "$exception_list": [
+                 %{
+                   type: "** (exit) \"exit reason\"",
+                   value: "** (exit) \"exit reason\"",
                    mechanism: %{handled: true, type: "generic"}
                  }
                ]
@@ -749,7 +780,7 @@ defmodule LogHog.HandlerTest do
     assert String.ends_with?(value_end, "\nType: :worker")
   end
 
-  @tag handle_sasl_reports: true
+  @tag handle_sasl_reports: true, config: [capture_level: :debug]
   test "supervisor progress report child started", %{handler_ref: ref, sender_pid: sender_pid} do
     LoggerHandlerKit.Act.supervisor_progress_report(:child_started)
     LoggerHandlerKit.Assert.assert_logged(ref)

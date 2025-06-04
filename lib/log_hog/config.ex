@@ -24,6 +24,12 @@ defmodule LogHog.Config do
       type: {:list, :atom},
       default: [],
       doc: "List of metadata keys to include in event properties"
+    ],
+    capture_level: [
+      type: {:or, [{:in, Logger.levels()}, nil]},
+      default: :error,
+      doc:
+        "Minimum level for logs that should be captured as errors. Errors with `crash_reason` are always captured."
     ]
   ]
 
