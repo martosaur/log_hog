@@ -55,14 +55,14 @@ defmodule LogHog.Config do
   @doc """
   Reads and validates config from global application configuration
   """
-  @spec read!() :: config() | :missing_config
+  @spec read!() :: config()
   def read!() do
     raw_options =
       Application.get_all_env(:log_hog) |> Keyword.take(Keyword.keys(@configuration_schema))
 
     case Keyword.get(raw_options, :enable, false) do
       false -> %{enable: false}
-      raw_options -> validate!(raw_options)
+      _ -> validate!(raw_options)
     end
   end
 
