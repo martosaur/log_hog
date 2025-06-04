@@ -6,12 +6,12 @@ defmodule LogHog.Application do
   def start(_type, _args) do
     children =
       case LogHog.Config.read!() do
-        %{} = config ->
+        %{enable: true} = config ->
           :logger.add_handler(:log_hog, LogHog.Handler, %{config: config})
 
           [{LogHog.Supervisor, config}]
 
-        :missing_config ->
+        _ ->
           []
       end
 

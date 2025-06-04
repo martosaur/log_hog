@@ -1,5 +1,10 @@
 defmodule LogHog.Config do
   @configuration_schema [
+    enable: [
+      type: :boolean,
+      default: true,
+      doc: "Automatically start LogHog?"
+    ],
     public_url: [
       type: :string,
       required: true,
@@ -50,10 +55,11 @@ defmodule LogHog.Config do
   """
   @spec read!() :: config() | :missing_config
   def read!() do
-    Application.get_all_env(:log_hog)
-    |> Keyword.take(Keyword.keys(@configuration_schema))
-    |> case do
-      [] -> :missing_config
+    raw_options =
+      Application.get_all_env(:log_hog) |> Keyword.take(Keyword.keys(@configuration_schema))
+
+    case Keyword.get(raw_options, :enable, false) do
+      false -> %{enable: false}
       raw_options -> validate!(raw_options)
     end
   end
