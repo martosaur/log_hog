@@ -1,7 +1,7 @@
 defmodule LogHog.MixProject do
   use Mix.Project
 
-  @version "0.0.1"
+  @version "0.1.0"
   @source_url "https://github.com/martosaur/log_hog"
 
   def project do

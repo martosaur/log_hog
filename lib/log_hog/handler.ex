@@ -1,6 +1,6 @@
 defmodule LogHog.Handler do
   @moduledoc """
-  A logger handler [`:logger` handler](https://www.erlang.org/doc/apps/kernel/logger_chapter.html#handlers)
+  [`logger handler`](https://www.erlang.org/doc/apps/kernel/logger_chapter.html#handlers)
   """
   @behaviour :logger_handler
 
