@@ -1,4 +1,7 @@
 defmodule LogHog.Handler do
+  @moduledoc """
+  A logger handler [`:logger` handler](https://www.erlang.org/doc/apps/kernel/logger_chapter.html#handlers)
+  """
   @behaviour :logger_handler
 
   @impl :logger_handler
@@ -20,7 +23,7 @@ defmodule LogHog.Handler do
     end
   end
 
-  def to_event(log_event, config) do
+  defp to_event(log_event, config) do
     exception =
       Enum.reduce(
         [&type/1, &value/1, &stacktrace/1],
@@ -49,19 +52,19 @@ defmodule LogHog.Handler do
     }
   end
 
-  def type(%{meta: %{crash_reason: {reason, _}}}) when is_exception(reason),
+  defp type(%{meta: %{crash_reason: {reason, _}}}) when is_exception(reason),
     do: %{type: Exception.format_banner(:error, reason)}
 
-  def type(%{meta: %{crash_reason: {{:nocatch, throw}, _}}}),
+  defp type(%{meta: %{crash_reason: {{:nocatch, throw}, _}}}),
     do: %{type: Exception.format_banner(:throw, throw)}
 
-  def type(%{meta: %{crash_reason: {reason, _}}}),
+  defp type(%{meta: %{crash_reason: {reason, _}}}),
     do: %{type: Exception.format_banner(:exit, reason)}
 
-  def type(%{msg: {:string, chardata}}), do: %{type: IO.iodata_to_binary(chardata)}
+  defp type(%{msg: {:string, chardata}}), do: %{type: IO.iodata_to_binary(chardata)}
 
-  def type(%{msg: {:report, report}, meta: %{report_cb: report_cb}})
-      when is_function(report_cb, 1) do
+  defp type(%{msg: {:report, report}, meta: %{report_cb: report_cb}})
+       when is_function(report_cb, 1) do
     {io_format, data} = report_cb.(report)
 
     io_format
@@ -71,33 +74,33 @@ defmodule LogHog.Handler do
     |> then(fn [type | _] -> %{type: type} end)
   end
 
-  def type(%{msg: {:report, report}}), do: %{type: inspect(report)}
+  defp type(%{msg: {:report, report}}), do: %{type: inspect(report)}
 
-  def type(%{msg: {io_format, data}}),
+  defp type(%{msg: {io_format, data}}),
     do: io_format |> :io_lib.format(data) |> IO.iodata_to_binary() |> then(&%{type: &1})
 
-  def value(%{meta: %{crash_reason: {reason, stacktrace}}}) when is_exception(reason),
+  defp value(%{meta: %{crash_reason: {reason, stacktrace}}}) when is_exception(reason),
     do: %{value: Exception.format_banner(:error, reason, stacktrace)}
 
-  def value(%{meta: %{crash_reason: {{:nocatch, throw}, stacktrace}}}),
+  defp value(%{meta: %{crash_reason: {{:nocatch, throw}, stacktrace}}}),
     do: %{value: Exception.format_banner(:throw, throw, stacktrace)}
 
-  def value(%{meta: %{crash_reason: {reason, stacktrace}}}),
+  defp value(%{meta: %{crash_reason: {reason, stacktrace}}}),
     do: %{value: Exception.format_banner(:exit, reason, stacktrace)}
 
-  def value(%{msg: {:report, report}, meta: %{report_cb: report_cb}})
-      when is_function(report_cb, 1) do
+  defp value(%{msg: {:report, report}, meta: %{report_cb: report_cb}})
+       when is_function(report_cb, 1) do
     {io_format, data} = report_cb.(report)
     io_format |> :io_lib.format(data) |> IO.iodata_to_binary() |> then(&%{value: &1})
   end
 
-  def value(%{msg: {:string, chardata}}), do: %{value: IO.iodata_to_binary(chardata)}
-  def value(%{msg: {:report, report}}), do: %{value: inspect(report)}
+  defp value(%{msg: {:string, chardata}}), do: %{value: IO.iodata_to_binary(chardata)}
+  defp value(%{msg: {:report, report}}), do: %{value: inspect(report)}
 
-  def value(%{msg: {io_format, data}}),
+  defp value(%{msg: {io_format, data}}),
     do: io_format |> :io_lib.format(data) |> IO.iodata_to_binary() |> then(&%{value: &1})
 
-  def stacktrace(%{meta: %{crash_reason: {_reason, [_ | _] = stacktrace}}}) do
+  defp stacktrace(%{meta: %{crash_reason: {_reason, [_ | _] = stacktrace}}}) do
     frames =
       for {module, function, arity_or_args, location} <- stacktrace do
         %{
@@ -118,5 +121,5 @@ defmodule LogHog.Handler do
     }
   end
 
-  def stacktrace(_event), do: %{}
+  defp stacktrace(_event), do: %{}
 end

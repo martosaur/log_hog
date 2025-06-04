@@ -1,15 +1,19 @@
 defmodule LogHog.API.Client do
+  @moduledoc """
+  Behaviour and the default implementation of a PostHog API Client. Uses `Req`.
+  """
   @behaviour __MODULE__
 
   defstruct [:client, :module]
 
+  @type t() :: %__MODULE__{
+          client: client(),
+          module: atom()
+        }
   @type client() :: any()
   @type response() :: {:ok, %{status: non_neg_integer(), body: any()}} | {:error, Exception.t()}
 
-  @callback client(api_key :: String.t(), cloud :: String.t()) :: %__MODULE__{
-              client: client(),
-              module: atom()
-            }
+  @callback client(api_key :: String.t(), cloud :: String.t()) :: t()
   @callback request(client :: client(), method :: atom(), url :: String.t(), opts :: keyword()) ::
               response()
 

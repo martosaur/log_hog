@@ -82,5 +82,5 @@ defmodule LogHog.Sender do
     LogHog.API.post_batch(state.api_client, state.events)
   end
 
-  def terminate(_reason, _state), do: IO.inspect("HELLOOOOOOO!")
+  def terminate(_reason, _state), do: :ok
 end

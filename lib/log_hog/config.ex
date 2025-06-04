@@ -8,12 +8,14 @@ defmodule LogHog.Config do
     public_url: [
       type: :string,
       required: true,
-      doc: "i.e. https://us.i.posthog.com"
+      doc: "`https://us.i.posthog.com` for US cloud or `https://eu.i.posthog.com` for EU cloud"
     ],
     api_key: [
       type: :string,
       required: true,
-      doc: "Your PostHog API key"
+      doc: """
+      Your PostHog Project API key. Find it in your project's settings under Project ID section
+      """
     ],
     api_client_module: [
       type: :atom,

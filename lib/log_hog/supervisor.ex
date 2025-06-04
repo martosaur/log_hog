@@ -1,7 +1,7 @@
 defmodule LogHog.Supervisor do
   @moduledoc """
   Supervisor that manages all processes required for logging. By default,
-  `DiscoLog` starts it automatically.
+  `LogHog` starts it automatically.
   """
   use Supervisor
 
