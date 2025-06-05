@@ -60,7 +60,7 @@ defmodule LogHog.Config do
     raw_options =
       Application.get_all_env(:log_hog) |> Keyword.take(Keyword.keys(@configuration_schema))
 
-    case Keyword.get(raw_options, :enable, false) do
+    case Keyword.get(raw_options, :enable) do
       false -> %{enable: false}
       _ -> validate!(raw_options)
     end
