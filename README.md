@@ -2,6 +2,8 @@
 
 [PostHog Error Tracking](https://posthog.com/docs/error-tracking) for Elixir
 
+![](assets/screenshot.png)
+
 PostHog Error Tracking is under active development, and so is this library. It
 works, but there is still a long way ahead of it. Most notably, PostHog's error
 tracking is language-aware and does not support Elixir yet. So we have to

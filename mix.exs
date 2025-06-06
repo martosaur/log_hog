@@ -45,7 +45,10 @@ defmodule LogHog.MixProject do
       source_ref: "v#{@version}",
       extras: [
         "README.md"
-      ]
+      ],
+      assets: %{
+        "assets" => "assets"
+      }
     ]
   end
 
