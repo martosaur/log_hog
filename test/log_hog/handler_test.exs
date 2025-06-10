@@ -263,7 +263,7 @@ defmodule LogHog.HandlerTest do
              properties: %{
                "$exception_list": [
                  %{
-                   type: "** (RuntimeError) oops",
+                   type: "RuntimeError",
                    value: "** (RuntimeError) oops",
                    mechanism: %{handled: true, type: "generic"},
                    stacktrace: %{
@@ -386,7 +386,7 @@ defmodule LogHog.HandlerTest do
              properties: %{
                "$exception_list": [
                  %{
-                   type: "** (RuntimeError) oops",
+                   type: "RuntimeError",
                    value: "** (RuntimeError) oops",
                    mechanism: %{handled: true, type: "generic"},
                    stacktrace: %{
@@ -540,7 +540,7 @@ defmodule LogHog.HandlerTest do
              properties: %{
                "$exception_list": [
                  %{
-                   type: "** (RuntimeError) oops",
+                   type: "RuntimeError",
                    value: "** (RuntimeError) oops",
                    mechanism: %{handled: true, type: "generic"},
                    stacktrace: %{
@@ -593,7 +593,7 @@ defmodule LogHog.HandlerTest do
              properties: %{
                "$exception_list": [
                  %{
-                   type: "** (RuntimeError) oops",
+                   type: "RuntimeError",
                    value: "** (RuntimeError) oops",
                    mechanism: %{handled: true, type: "generic"},
                    stacktrace: %{
@@ -630,7 +630,7 @@ defmodule LogHog.HandlerTest do
              properties: %{
                "$exception_list": [
                  %{
-                   type: "** (ErlangError) Erlang error: {:nocatch, \"catch!\"}",
+                   type: "ErlangError",
                    value: "** (ErlangError) Erlang error: {:nocatch, \"catch!\"}",
                    mechanism: %{handled: true, type: "generic"},
                    stacktrace: %{
@@ -664,7 +664,7 @@ defmodule LogHog.HandlerTest do
              properties: %{
                "$exception_list": [
                  %{
-                   type: "** (RuntimeError) oops",
+                   type: "RuntimeError",
                    value: "** (RuntimeError) oops",
                    mechanism: %{handled: true, type: "generic"},
                    stacktrace: %{
@@ -723,7 +723,7 @@ defmodule LogHog.HandlerTest do
              properties: %{
                "$exception_list": [
                  %{
-                   type: "** (RuntimeError) oops",
+                   type: "RuntimeError",
                    value: "** (RuntimeError) oops",
                    mechanism: %{handled: true, type: "generic"},
                    stacktrace: %{
@@ -905,7 +905,7 @@ defmodule LogHog.HandlerTest do
              properties: %{
                "$exception_list": [
                  %{
-                   type: "** (ArgumentError) errors were found at the given arguments:",
+                   type: "ArgumentError",
                    value:
                      "** (ArgumentError) errors were found at the given arguments:\n\n  * 1st argument: invalid time unit\n",
                    stacktrace: %{
