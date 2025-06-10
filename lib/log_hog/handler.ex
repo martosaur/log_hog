@@ -60,7 +60,7 @@ defmodule LogHog.Handler do
   end
 
   defp do_type(%{meta: %{crash_reason: {reason, _}}}) when is_exception(reason),
-    do: Exception.format_banner(:error, reason)
+    do: inspect(reason.__struct__)
 
   defp do_type(%{meta: %{crash_reason: {{:nocatch, throw}, _}}}),
     do: Exception.format_banner(:throw, throw)
