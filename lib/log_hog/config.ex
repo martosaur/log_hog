@@ -37,6 +37,12 @@ defmodule LogHog.Config do
       default: :error,
       doc:
         "Minimum level for logs that should be captured as errors. Errors with `crash_reason` are always captured."
+    ],
+    in_app_otp_apps: [
+      type: {:list, :atom},
+      default: [],
+      doc:
+        "List of OTP app names of your applications. Stacktrace entries that belong to these apps will be marked as \"in_app\""
     ]
   ]
 
@@ -84,7 +90,16 @@ defmodule LogHog.Config do
     with {:ok, validated} <- NimbleOptions.validate(raw_options, @compiled_schema) do
       config = Map.new(validated)
       client = config.api_client_module.client(config.api_key, config.public_url)
-      {:ok, Map.put(config, :api_client, client)}
+
+      final_config =
+        config
+        |> Map.put(:api_client, client)
+        |> Map.put(
+          :in_app_modules,
+          config.in_app_otp_apps |> Enum.flat_map(&Application.spec(&1, :modules)) |> MapSet.new()
+        )
+
+      {:ok, final_config}
     end
   end
 end

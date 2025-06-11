@@ -26,7 +26,7 @@ defmodule LogHog.Handler do
   defp to_event(log_event, config) do
     exception =
       Enum.reduce(
-        [&type/1, &value/1, &stacktrace/1],
+        [&type/1, &value/1, &stacktrace(&1, config.in_app_modules)],
         %{mechanism: %{handled: true, type: "generic"}},
         fn fun, acc ->
           Map.merge(acc, fun.(log_event))
@@ -106,9 +106,11 @@ defmodule LogHog.Handler do
   defp value(%{msg: {io_format, data}}),
     do: io_format |> :io_lib.format(data) |> IO.iodata_to_binary() |> then(&%{value: &1})
 
-  defp stacktrace(%{meta: %{crash_reason: {_reason, [_ | _] = stacktrace}}}) do
+  defp stacktrace(%{meta: %{crash_reason: {_reason, [_ | _] = stacktrace}}}, in_app_modules) do
     frames =
       for {module, function, arity_or_args, location} <- stacktrace do
+        in_app = module in in_app_modules
+
         %{
           platform: "custom",
           lang: "elixir",
@@ -116,7 +118,7 @@ defmodule LogHog.Handler do
           filename: Keyword.get(location, :file, []) |> IO.chardata_to_string(),
           lineno: Keyword.get(location, :line),
           module: inspect(module),
-          in_app: true
+          in_app: in_app
         }
       end
 
@@ -128,5 +130,5 @@ defmodule LogHog.Handler do
     }
   end
 
-  defp stacktrace(_event), do: %{}
+  defp stacktrace(_event, _), do: %{}
 end

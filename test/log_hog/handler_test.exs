@@ -270,7 +270,7 @@ defmodule LogHog.HandlerTest do
                      type: "raw",
                      frames: [
                        %{
-                         in_app: true,
+                         in_app: false,
                          filename: "lib/logger_handler_kit/act.ex",
                          function: "anonymous fn/0 in LoggerHandlerKit.Act.task_error/1",
                          lineno: _,
@@ -279,7 +279,7 @@ defmodule LogHog.HandlerTest do
                          lang: "elixir"
                        },
                        %{
-                         in_app: true,
+                         in_app: false,
                          filename: "lib/task/supervised.ex",
                          function: "Task.Supervised.invoke_mfa/2",
                          lineno: _,
@@ -313,7 +313,7 @@ defmodule LogHog.HandlerTest do
                      type: "raw",
                      frames: [
                        %{
-                         in_app: true,
+                         in_app: false,
                          filename: "lib/logger_handler_kit/act.ex",
                          function: "anonymous fn/0 in LoggerHandlerKit.Act.task_error/1",
                          lineno: _,
@@ -322,7 +322,7 @@ defmodule LogHog.HandlerTest do
                          lang: "elixir"
                        },
                        %{
-                         in_app: true,
+                         in_app: false,
                          filename: "lib/task/supervised.ex",
                          function: "Task.Supervised.invoke_mfa/2",
                          lineno: _,
@@ -356,7 +356,7 @@ defmodule LogHog.HandlerTest do
                      type: "raw",
                      frames: [
                        %{
-                         in_app: true,
+                         in_app: false,
                          filename: "lib/logger_handler_kit/act.ex",
                          function: "anonymous fn/0 in LoggerHandlerKit.Act.task_error/1",
                          lineno: _,
@@ -365,7 +365,7 @@ defmodule LogHog.HandlerTest do
                          lang: "elixir"
                        },
                        %{
-                         in_app: true,
+                         in_app: false,
                          filename: "lib/task/supervised.ex",
                          function: "Task.Supervised.invoke_mfa/2",
                          lineno: _,
@@ -399,7 +399,7 @@ defmodule LogHog.HandlerTest do
                      type: "raw",
                      frames: [
                        %{
-                         in_app: true,
+                         in_app: false,
                          filename: "lib/logger_handler_kit/act.ex",
                          function: "anonymous fn/0 in LoggerHandlerKit.Act.genserver_crash/1",
                          lineno: _,
@@ -410,7 +410,7 @@ defmodule LogHog.HandlerTest do
                        %{
                          filename: "gen_server.erl",
                          function: ":gen_server.try_handle_call/4",
-                         in_app: true,
+                         in_app: false,
                          lineno: _,
                          module: ":gen_server",
                          platform: "custom",
@@ -419,7 +419,7 @@ defmodule LogHog.HandlerTest do
                        %{
                          filename: "gen_server.erl",
                          function: ":gen_server.handle_msg/6",
-                         in_app: true,
+                         in_app: false,
                          lineno: _,
                          module: ":gen_server",
                          platform: "custom",
@@ -428,7 +428,7 @@ defmodule LogHog.HandlerTest do
                        %{
                          filename: "proc_lib.erl",
                          function: ":proc_lib.init_p_do_apply/3",
-                         in_app: true,
+                         in_app: false,
                          lineno: _,
                          module: ":proc_lib",
                          platform: "custom",
@@ -461,7 +461,7 @@ defmodule LogHog.HandlerTest do
                      type: "raw",
                      frames: [
                        %{
-                         in_app: true,
+                         in_app: false,
                          filename: "lib/logger_handler_kit/act.ex",
                          function: "anonymous fn/0 in LoggerHandlerKit.Act.genserver_crash/1",
                          lineno: _,
@@ -476,7 +476,7 @@ defmodule LogHog.HandlerTest do
                          module: ":gen_server",
                          platform: "custom",
                          lang: "elixir",
-                         in_app: true
+                         in_app: false
                        },
                        %{
                          filename: "gen_server.erl",
@@ -485,12 +485,12 @@ defmodule LogHog.HandlerTest do
                          module: ":gen_server",
                          platform: "custom",
                          lang: "elixir",
-                         in_app: true
+                         in_app: false
                        },
                        %{
                          filename: "proc_lib.erl",
                          function: ":proc_lib.init_p_do_apply/3",
-                         in_app: true,
+                         in_app: false,
                          lineno: _,
                          module: ":proc_lib",
                          platform: "custom",
@@ -564,7 +564,7 @@ defmodule LogHog.HandlerTest do
                          function: "anonymous fn/0 in LoggerHandlerKit.Act.gen_statem_crash/1",
                          module: "LoggerHandlerKit.Act",
                          filename: "lib/logger_handler_kit/act.ex",
-                         in_app: true,
+                         in_app: false,
                          lineno: _,
                          platform: "custom",
                          lang: "elixir"
@@ -573,7 +573,7 @@ defmodule LogHog.HandlerTest do
                          function: ":gen_statem.loop_state_callback/11",
                          module: ":gen_statem",
                          filename: "gen_statem.erl",
-                         in_app: true,
+                         in_app: false,
                          lineno: _,
                          platform: "custom",
                          lang: "elixir"
@@ -582,7 +582,7 @@ defmodule LogHog.HandlerTest do
                          function: ":proc_lib.init_p_do_apply/3",
                          module: ":proc_lib",
                          filename: "proc_lib.erl",
-                         in_app: true,
+                         in_app: false,
                          lineno: _,
                          platform: "custom",
                          lang: "elixir"
@@ -620,7 +620,7 @@ defmodule LogHog.HandlerTest do
                        %{
                          filename: "lib/logger_handler_kit/act.ex",
                          function: "anonymous fn/0 in LoggerHandlerKit.Act.bare_process_crash/2",
-                         in_app: true,
+                         in_app: false,
                          lineno: _,
                          module: "LoggerHandlerKit.Act",
                          platform: "custom",
@@ -659,7 +659,7 @@ defmodule LogHog.HandlerTest do
                        %{
                          filename: "lib/logger_handler_kit/act.ex",
                          function: "anonymous fn/0 in LoggerHandlerKit.Act.bare_process_crash/2",
-                         in_app: true,
+                         in_app: false,
                          lineno: _,
                          module: "LoggerHandlerKit.Act",
                          platform: "custom",
@@ -695,7 +695,7 @@ defmodule LogHog.HandlerTest do
                          filename: "lib/logger_handler_kit/act.ex",
                          function:
                            "anonymous fn/0 in LoggerHandlerKit.Act.genserver_init_crash/0",
-                         in_app: true,
+                         in_app: false,
                          lineno: _,
                          module: "LoggerHandlerKit.Act",
                          platform: "custom",
@@ -704,7 +704,7 @@ defmodule LogHog.HandlerTest do
                        %{
                          filename: "gen_server.erl",
                          function: ":gen_server.init_it/2",
-                         in_app: true,
+                         in_app: false,
                          lineno: _,
                          module: ":gen_server",
                          platform: "custom",
@@ -713,7 +713,7 @@ defmodule LogHog.HandlerTest do
                        %{
                          filename: "gen_server.erl",
                          function: ":gen_server.init_it/6",
-                         in_app: true,
+                         in_app: false,
                          lineno: _,
                          module: ":gen_server",
                          platform: "custom",
@@ -722,7 +722,7 @@ defmodule LogHog.HandlerTest do
                        %{
                          filename: "proc_lib.erl",
                          function: ":proc_lib.init_p_do_apply/3",
-                         in_app: true,
+                         in_app: false,
                          lineno: _,
                          module: ":proc_lib",
                          platform: "custom",
@@ -757,7 +757,7 @@ defmodule LogHog.HandlerTest do
                        %{
                          filename: "lib/logger_handler_kit/act.ex",
                          function: "anonymous fn/1 in LoggerHandlerKit.Act.proc_lib_crash/1",
-                         in_app: true,
+                         in_app: false,
                          lineno: _,
                          module: "LoggerHandlerKit.Act",
                          platform: "custom",
@@ -766,7 +766,7 @@ defmodule LogHog.HandlerTest do
                        %{
                          filename: "proc_lib.erl",
                          function: ":proc_lib.init_p/3",
-                         in_app: true,
+                         in_app: false,
                          lineno: _,
                          module: ":proc_lib",
                          platform: "custom",
@@ -942,7 +942,7 @@ defmodule LogHog.HandlerTest do
                        %{
                          filename: "",
                          function: ":erlang.system_time(:foo)",
-                         in_app: true,
+                         in_app: false,
                          lineno: nil,
                          module: ":erlang",
                          platform: "custom",
@@ -952,6 +952,37 @@ defmodule LogHog.HandlerTest do
                      ]
                    },
                    mechanism: %{type: "generic", handled: true}
+                 }
+               ]
+             }
+           } = event
+  end
+
+  @tag config: [in_app_otp_apps: [:logger_handler_kit]]
+  test "marks in_app frames as such", %{handler_ref: ref, sender_pid: sender_pid} do
+    LoggerHandlerKit.Act.task_error(:exception)
+    LoggerHandlerKit.Assert.assert_logged(ref)
+
+    assert %{events: [event]} = :sys.get_state(sender_pid)
+
+    assert %{
+             event: "$exception",
+             properties: %{
+               "$exception_list": [
+                 %{
+                   stacktrace: %{
+                     type: "raw",
+                     frames: [
+                       %{
+                         in_app: true,
+                         module: "LoggerHandlerKit.Act"
+                       },
+                       %{
+                         in_app: false,
+                         module: "Task.Supervised"
+                       }
+                     ]
+                   }
                  }
                ]
              }
