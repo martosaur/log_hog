@@ -118,7 +118,8 @@ defmodule LogHog.Handler do
           filename: Keyword.get(location, :file, []) |> IO.chardata_to_string(),
           lineno: Keyword.get(location, :line),
           module: inspect(module),
-          in_app: in_app
+          in_app: in_app,
+          resolved: true
         }
       end
 
