@@ -110,12 +110,13 @@ defmodule LogHog.Handler do
     frames =
       for {module, function, arity_or_args, location} <- stacktrace do
         %{
-          lineno: Keyword.get(location, :line),
-          filename: Keyword.get(location, :file, []) |> IO.chardata_to_string(),
+          platform: "custom",
+          lang: "elixir",
           function: Exception.format_mfa(module, function, arity_or_args),
+          filename: Keyword.get(location, :file, []) |> IO.chardata_to_string(),
+          lineno: Keyword.get(location, :line),
           module: inspect(module),
-          in_app: true,
-          platform: "python"
+          in_app: true
         }
       end
 

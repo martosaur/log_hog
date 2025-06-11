@@ -275,7 +275,8 @@ defmodule LogHog.HandlerTest do
                          function: "anonymous fn/0 in LoggerHandlerKit.Act.task_error/1",
                          lineno: _,
                          module: "LoggerHandlerKit.Act",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        },
                        %{
                          in_app: true,
@@ -283,7 +284,8 @@ defmodule LogHog.HandlerTest do
                          function: "Task.Supervised.invoke_mfa/2",
                          lineno: _,
                          module: "Task.Supervised",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        }
                      ]
                    }
@@ -316,7 +318,8 @@ defmodule LogHog.HandlerTest do
                          function: "anonymous fn/0 in LoggerHandlerKit.Act.task_error/1",
                          lineno: _,
                          module: "LoggerHandlerKit.Act",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        },
                        %{
                          in_app: true,
@@ -324,7 +327,8 @@ defmodule LogHog.HandlerTest do
                          function: "Task.Supervised.invoke_mfa/2",
                          lineno: _,
                          module: "Task.Supervised",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        }
                      ]
                    }
@@ -357,7 +361,8 @@ defmodule LogHog.HandlerTest do
                          function: "anonymous fn/0 in LoggerHandlerKit.Act.task_error/1",
                          lineno: _,
                          module: "LoggerHandlerKit.Act",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        },
                        %{
                          in_app: true,
@@ -365,7 +370,8 @@ defmodule LogHog.HandlerTest do
                          function: "Task.Supervised.invoke_mfa/2",
                          lineno: _,
                          module: "Task.Supervised",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        }
                      ]
                    }
@@ -398,7 +404,8 @@ defmodule LogHog.HandlerTest do
                          function: "anonymous fn/0 in LoggerHandlerKit.Act.genserver_crash/1",
                          lineno: _,
                          module: "LoggerHandlerKit.Act",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        },
                        %{
                          filename: "gen_server.erl",
@@ -406,7 +413,8 @@ defmodule LogHog.HandlerTest do
                          in_app: true,
                          lineno: _,
                          module: ":gen_server",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        },
                        %{
                          filename: "gen_server.erl",
@@ -414,7 +422,8 @@ defmodule LogHog.HandlerTest do
                          in_app: true,
                          lineno: _,
                          module: ":gen_server",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        },
                        %{
                          filename: "proc_lib.erl",
@@ -422,12 +431,14 @@ defmodule LogHog.HandlerTest do
                          in_app: true,
                          lineno: _,
                          module: ":proc_lib",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        }
                      ]
                    }
                  }
-               ]
+               ],
+               distinct_id: "unknown"
              }
            } = event
   end
@@ -455,23 +466,26 @@ defmodule LogHog.HandlerTest do
                          function: "anonymous fn/0 in LoggerHandlerKit.Act.genserver_crash/1",
                          lineno: _,
                          module: "LoggerHandlerKit.Act",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        },
                        %{
                          filename: "gen_server.erl",
                          function: ":gen_server.try_handle_call/4",
-                         in_app: true,
                          lineno: _,
                          module: ":gen_server",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir",
+                         in_app: true
                        },
                        %{
                          filename: "gen_server.erl",
                          function: ":gen_server.handle_msg/6",
-                         in_app: true,
                          lineno: _,
                          module: ":gen_server",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir",
+                         in_app: true
                        },
                        %{
                          filename: "proc_lib.erl",
@@ -479,7 +493,8 @@ defmodule LogHog.HandlerTest do
                          in_app: true,
                          lineno: _,
                          module: ":proc_lib",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        }
                      ]
                    }
@@ -551,7 +566,8 @@ defmodule LogHog.HandlerTest do
                          filename: "lib/logger_handler_kit/act.ex",
                          in_app: true,
                          lineno: _,
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        },
                        %{
                          function: ":gen_statem.loop_state_callback/11",
@@ -559,7 +575,8 @@ defmodule LogHog.HandlerTest do
                          filename: "gen_statem.erl",
                          in_app: true,
                          lineno: _,
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        },
                        %{
                          function: ":proc_lib.init_p_do_apply/3",
@@ -567,13 +584,15 @@ defmodule LogHog.HandlerTest do
                          filename: "proc_lib.erl",
                          in_app: true,
                          lineno: _,
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        }
                      ],
                      type: "raw"
                    }
                  }
-               ]
+               ],
+               distinct_id: "unknown"
              }
            } = event
   end
@@ -604,13 +623,15 @@ defmodule LogHog.HandlerTest do
                          in_app: true,
                          lineno: _,
                          module: "LoggerHandlerKit.Act",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        }
                      ],
                      type: "raw"
                    }
                  }
-               ]
+               ],
+               distinct_id: "unknown"
              }
            } = event
   end
@@ -641,7 +662,8 @@ defmodule LogHog.HandlerTest do
                          in_app: true,
                          lineno: _,
                          module: "LoggerHandlerKit.Act",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        }
                      ],
                      type: "raw"
@@ -676,7 +698,8 @@ defmodule LogHog.HandlerTest do
                          in_app: true,
                          lineno: _,
                          module: "LoggerHandlerKit.Act",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        },
                        %{
                          filename: "gen_server.erl",
@@ -684,7 +707,8 @@ defmodule LogHog.HandlerTest do
                          in_app: true,
                          lineno: _,
                          module: ":gen_server",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        },
                        %{
                          filename: "gen_server.erl",
@@ -692,7 +716,8 @@ defmodule LogHog.HandlerTest do
                          in_app: true,
                          lineno: _,
                          module: ":gen_server",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        },
                        %{
                          filename: "proc_lib.erl",
@@ -700,7 +725,8 @@ defmodule LogHog.HandlerTest do
                          in_app: true,
                          lineno: _,
                          module: ":proc_lib",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        }
                      ],
                      type: "raw"
@@ -734,7 +760,8 @@ defmodule LogHog.HandlerTest do
                          in_app: true,
                          lineno: _,
                          module: "LoggerHandlerKit.Act",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        },
                        %{
                          filename: "proc_lib.erl",
@@ -742,7 +769,8 @@ defmodule LogHog.HandlerTest do
                          in_app: true,
                          lineno: _,
                          module: ":proc_lib",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        }
                      ],
                      type: "raw"
@@ -917,7 +945,8 @@ defmodule LogHog.HandlerTest do
                          in_app: true,
                          lineno: nil,
                          module: ":erlang",
-                         platform: "python"
+                         platform: "custom",
+                         lang: "elixir"
                        }
                        | _
                      ]
