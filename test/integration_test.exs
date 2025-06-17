@@ -36,6 +36,11 @@ defmodule LogHog.IntegrationTest do
     wait.()
   end
 
+  test "genserver crash exception", %{wait_fun: wait} do
+    LoggerHandlerKit.Act.genserver_crash(:exception)
+    wait.()
+  end
+
   test "task exception", %{wait_fun: wait} do
     LoggerHandlerKit.Act.task_error(:exception)
     wait.()
