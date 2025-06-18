@@ -98,6 +98,10 @@ defmodule LogHog.Config do
           :in_app_modules,
           config.in_app_otp_apps |> Enum.flat_map(&Application.spec(&1, :modules)) |> MapSet.new()
         )
+        |> Map.put(:global_context, %{
+          "$lib": "LogHog",
+          "$lib_version": Application.spec(:log_hog, :vsn) |> to_string()
+        })
 
       {:ok, final_config}
     end

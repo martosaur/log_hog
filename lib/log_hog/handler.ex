@@ -45,6 +45,7 @@ defmodule LogHog.Handler do
       event: "$exception",
       properties:
         Context.get()
+        |> Map.merge(config.global_context)
         |> Map.merge(%{
           distinct_id: "unknown",
           "$exception_list": [exception]

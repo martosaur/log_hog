@@ -7,7 +7,7 @@ defmodule LogHog.HandlerTest do
 
   @moduletag capture_log: true
 
-  setup_all {LoggerHandlerKit.Arrange, :ensure_per_handler_translation}
+  setup {LoggerHandlerKit.Arrange, :ensure_per_handler_translation}
 
   setup %{test: test} = context do
     stub_with(LogHog.API.Mock, LogHog.API.Stub)
@@ -48,7 +48,7 @@ defmodule LogHog.HandlerTest do
 
     assert %{events: [event]} = :sys.get_state(sender_pid)
 
-    assert event == %{
+    assert %{
              event: "$exception",
              properties: %{
                distinct_id: "foo",
@@ -60,7 +60,29 @@ defmodule LogHog.HandlerTest do
                  }
                ]
              }
-           }
+           } = event
+  end
+
+  test "always exports global context", %{handler_ref: ref, sender_pid: sender_pid} do
+    Logger.info("Hello World")
+    LoggerHandlerKit.Assert.assert_logged(ref)
+
+    assert %{events: [event]} = :sys.get_state(sender_pid)
+
+    assert %{
+             event: "$exception",
+             properties: %{
+               "$lib": "LogHog",
+               "$lib_version": _,
+               "$exception_list": [
+                 %{
+                   type: "Hello World",
+                   value: "Hello World",
+                   mechanism: %{handled: true, type: "generic"}
+                 }
+               ]
+             }
+           } = event
   end
 
   @tag config: [capture_level: :warning]
@@ -78,7 +100,7 @@ defmodule LogHog.HandlerTest do
 
     assert %{events: [event]} = :sys.get_state(sender_pid)
 
-    assert event == %{
+    assert %{
              event: "$exception",
              properties: %{
                distinct_id: "unknown",
@@ -90,7 +112,7 @@ defmodule LogHog.HandlerTest do
                  }
                ]
              }
-           }
+           } = event
   end
 
   test "string message", %{handler_ref: ref, sender_pid: sender_pid} do
@@ -944,7 +966,7 @@ defmodule LogHog.HandlerTest do
                  }
                ]
              }
-           } == event
+           } = event
   end
 
   test "erlang frames in stacktrace", %{handler_ref: ref, sender_pid: sender_pid} do
