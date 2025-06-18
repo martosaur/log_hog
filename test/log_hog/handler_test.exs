@@ -3,6 +3,7 @@ defmodule LogHog.HandlerTest do
 
   import Mox
   require Logger
+  alias LogHog.Context
 
   @moduletag capture_log: true
 
@@ -920,6 +921,30 @@ defmodule LogHog.HandlerTest do
            } = maybe_encoded
 
     JSON.encode!(maybe_encoded)
+  end
+
+  @tag config: [metadata: [:extra]]
+  test "purposefully set context is always exported", %{handler_ref: ref, sender_pid: sender_pid} do
+    Context.set(%{foo: "bar"})
+    Logger.error("Error with metadata", hello: "world")
+    LoggerHandlerKit.Assert.assert_logged(ref)
+
+    assert %{events: [event]} = :sys.get_state(sender_pid)
+
+    assert %{
+             event: "$exception",
+             properties: %{
+               distinct_id: "unknown",
+               foo: "bar",
+               "$exception_list": [
+                 %{
+                   type: "Error with metadata",
+                   value: "Error with metadata",
+                   mechanism: %{handled: true, type: "generic"}
+                 }
+               ]
+             }
+           } == event
   end
 
   test "erlang frames in stacktrace", %{handler_ref: ref, sender_pid: sender_pid} do
