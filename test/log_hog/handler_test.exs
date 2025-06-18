@@ -1,46 +1,13 @@
 defmodule LogHog.HandlerTest do
-  use ExUnit.Case, async: true
+  use LogHog.Case, async: true
 
-  import Mox
   require Logger
   alias LogHog.Context
 
   @moduletag capture_log: true
 
   setup {LoggerHandlerKit.Arrange, :ensure_per_handler_translation}
-
-  setup %{test: test} = context do
-    stub_with(LogHog.API.Mock, LogHog.API.Stub)
-
-    config =
-      [
-        public_url: "https://us.i.posthog.com",
-        api_key: "my_api_key",
-        api_client_module: LogHog.API.Mock,
-        supervisor_name: test,
-        capture_level: :info
-      ]
-      |> Keyword.merge(context[:config] || [])
-      |> LogHog.Config.validate!()
-      |> Map.put(:max_batch_time_ms, to_timeout(60_000))
-      |> Map.put(:max_batch_events, 100)
-
-    start_link_supervised!({LogHog.Supervisor, config})
-    sender_pid = test |> LogHog.Registry.via(LogHog.Sender) |> GenServer.whereis()
-
-    big_config_override = Map.take(context, [:handle_otp_reports, :handle_sasl_reports, :level])
-
-    {context, on_exit} =
-      LoggerHandlerKit.Arrange.add_handler(
-        test,
-        LogHog.Handler,
-        config,
-        big_config_override
-      )
-
-    on_exit(on_exit)
-    Map.put(context, :sender_pid, sender_pid)
-  end
+  setup :setup_logger_handler
 
   test "takes distinct_id from metadata", %{handler_ref: ref, sender_pid: sender_pid} do
     Logger.info("Hello World", distinct_id: "foo")
