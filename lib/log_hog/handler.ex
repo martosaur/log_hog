@@ -4,6 +4,8 @@ defmodule LogHog.Handler do
   """
   @behaviour :logger_handler
 
+  alias LogHog.Context
+
   @impl :logger_handler
   def log(log_event, %{config: config}) do
     cond do
@@ -42,13 +44,12 @@ defmodule LogHog.Handler do
     %{
       event: "$exception",
       properties:
-        Map.merge(
-          %{
-            distinct_id: "unknown",
-            "$exception_list": [exception]
-          },
-          metadata
-        )
+        Context.get()
+        |> Map.merge(%{
+          distinct_id: "unknown",
+          "$exception_list": [exception]
+        })
+        |> Map.merge(metadata)
     }
   end
 
