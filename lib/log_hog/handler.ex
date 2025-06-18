@@ -46,6 +46,7 @@ defmodule LogHog.Handler do
       properties:
         Context.get()
         |> Map.merge(config.global_context)
+        |> enrich_context(log_event)
         |> Map.merge(%{
           distinct_id: "unknown",
           "$exception_list": [exception]
@@ -134,4 +135,19 @@ defmodule LogHog.Handler do
   end
 
   defp stacktrace(_event, _), do: %{}
+
+  defp enrich_context(context, %{meta: %{conn: conn}}) when is_struct(conn, Plug.Conn) do
+    case context do
+      # Context was set and survived
+      %{"$current_url" => _} ->
+        context
+
+      _ ->
+        conn
+        |> LogHog.Integrations.Plug.conn_to_context()
+        |> Map.merge(context)
+    end
+  end
+
+  defp enrich_context(context, _log_event), do: context
 end
