@@ -61,10 +61,7 @@ defmodule LogHog.MixProject do
       {:nimble_options, "~> 1.1"},
       {:req, "~> 0.5.10"},
       {:logger_json, "~> 7.0"},
-      {:logger_handler_kit,
-       git: "https://github.com/martosaur/logger_handler_kit.git",
-       sha: "6676039ba8fbd09898ea18ac9436a743fa4fbb14",
-       only: :test},
+      {:logger_handler_kit, "~> 0.3", only: :test},
       {:mox, "~> 1.1", only: :test},
       {:ex_doc, "~> 0.37", only: :dev, runtime: false}
     ]
