@@ -29,7 +29,9 @@ defmodule LogHog.Handler do
     exception =
       Enum.reduce(
         [&type/1, &value/1, &stacktrace(&1, config.in_app_modules)],
-        %{mechanism: %{handled: true, type: "generic"}},
+        %{
+          mechanism: %{handled: not Map.has_key?(log_event.meta, :crash_reason), type: "generic"}
+        },
         fn fun, acc ->
           Map.merge(acc, fun.(log_event))
         end
