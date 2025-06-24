@@ -75,7 +75,7 @@ defmodule LogHog.HandlerTest do
                  %{
                    type: "** (exit) \"exit reason\"",
                    value: "** (exit) \"exit reason\"",
-                   mechanism: %{handled: true, type: "generic"}
+                   mechanism: %{handled: false, type: "generic"}
                  }
                ]
              }
@@ -255,7 +255,7 @@ defmodule LogHog.HandlerTest do
                  %{
                    type: "RuntimeError",
                    value: "** (RuntimeError) oops",
-                   mechanism: %{handled: true, type: "generic"},
+                   mechanism: %{handled: false, type: "generic"},
                    stacktrace: %{
                      type: "raw",
                      frames: [
@@ -298,7 +298,7 @@ defmodule LogHog.HandlerTest do
                  %{
                    type: "** (throw) \"catch!\"",
                    value: "** (throw) \"catch!\"",
-                   mechanism: %{handled: true, type: "generic"},
+                   mechanism: %{handled: false, type: "generic"},
                    stacktrace: %{
                      type: "raw",
                      frames: [
@@ -341,7 +341,7 @@ defmodule LogHog.HandlerTest do
                  %{
                    type: "** (exit) \"i quit\"",
                    value: "** (exit) \"i quit\"",
-                   mechanism: %{handled: true, type: "generic"},
+                   mechanism: %{handled: false, type: "generic"},
                    stacktrace: %{
                      type: "raw",
                      frames: [
@@ -384,7 +384,7 @@ defmodule LogHog.HandlerTest do
                  %{
                    type: "RuntimeError",
                    value: "** (RuntimeError) oops",
-                   mechanism: %{handled: true, type: "generic"},
+                   mechanism: %{handled: false, type: "generic"},
                    stacktrace: %{
                      type: "raw",
                      frames: [
@@ -446,7 +446,7 @@ defmodule LogHog.HandlerTest do
                  %{
                    type: "** (exit) \"i quit\"",
                    value: "** (exit) \"i quit\"",
-                   mechanism: %{handled: true, type: "generic"},
+                   mechanism: %{handled: false, type: "generic"},
                    stacktrace: %{
                      type: "raw",
                      frames: [
@@ -507,7 +507,7 @@ defmodule LogHog.HandlerTest do
                  %{
                    type: "** (exit) %LoggerHandlerKit.FakeStruct{hello: \"world\"}",
                    value: "** (exit) %LoggerHandlerKit.FakeStruct{hello: \"world\"}",
-                   mechanism: %{handled: true, type: "generic"}
+                   mechanism: %{handled: false, type: "generic"}
                  }
                ]
              }
@@ -527,7 +527,7 @@ defmodule LogHog.HandlerTest do
                  %{
                    type: "** (exit) bad return value: \"catch!\"",
                    value: "** (exit) bad return value: \"catch!\"",
-                   mechanism: %{handled: true, type: "generic"}
+                   mechanism: %{handled: false, type: "generic"}
                  }
                ]
              }
@@ -547,7 +547,7 @@ defmodule LogHog.HandlerTest do
                  %{
                    type: "RuntimeError",
                    value: "** (RuntimeError) oops",
-                   mechanism: %{handled: true, type: "generic"},
+                   mechanism: %{handled: false, type: "generic"},
                    stacktrace: %{
                      frames: [
                        %{
@@ -604,7 +604,7 @@ defmodule LogHog.HandlerTest do
                  %{
                    type: "RuntimeError",
                    value: "** (RuntimeError) oops",
-                   mechanism: %{handled: true, type: "generic"},
+                   mechanism: %{handled: false, type: "generic"},
                    stacktrace: %{
                      frames: [
                        %{
@@ -643,7 +643,7 @@ defmodule LogHog.HandlerTest do
                  %{
                    type: "ErlangError",
                    value: "** (ErlangError) Erlang error: {:nocatch, \"catch!\"}",
-                   mechanism: %{handled: true, type: "generic"},
+                   mechanism: %{handled: false, type: "generic"},
                    stacktrace: %{
                      frames: [
                        %{
@@ -678,7 +678,7 @@ defmodule LogHog.HandlerTest do
                  %{
                    type: "RuntimeError",
                    value: "** (RuntimeError) oops",
-                   mechanism: %{handled: true, type: "generic"},
+                   mechanism: %{handled: false, type: "generic"},
                    stacktrace: %{
                      frames: [
                        %{
@@ -741,7 +741,7 @@ defmodule LogHog.HandlerTest do
                  %{
                    type: "RuntimeError",
                    value: "** (RuntimeError) oops",
-                   mechanism: %{handled: true, type: "generic"},
+                   mechanism: %{handled: false, type: "generic"},
                    stacktrace: %{
                      frames: [
                        %{
@@ -965,7 +965,7 @@ defmodule LogHog.HandlerTest do
                        | _
                      ]
                    },
-                   mechanism: %{type: "generic", handled: true}
+                   mechanism: %{type: "generic", handled: false}
                  }
                ]
              }

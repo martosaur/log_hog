@@ -39,21 +39,26 @@ defmodule LogHog.Integrations.PlugTest do
 
       assert %{
                event: "$exception",
-               properties: %{
-                 distinct_id: "unknown",
-                 "$current_url": "http://localhost/exception",
-                 "$host": "localhost",
-                 "$ip": "127.0.0.1",
-                 "$pathname": "/exception",
-                 "$exception_list": [
-                   %{
-                     type: "RuntimeError",
-                     value: "** (RuntimeError) oops",
-                     mechanism: %{handled: true, type: "generic"}
-                   }
-                 ]
-               }
+               properties: properties
              } = event
+
+      assert %{
+               distinct_id: "unknown",
+               "$current_url": "http://localhost/exception",
+               "$host": "localhost",
+               "$ip": "127.0.0.1",
+               "$pathname": "/exception",
+               "$lib": "LogHog",
+               "$lib_version": "0.2.0",
+               "$exception_list": [
+                 %{
+                   type: "RuntimeError",
+                   value: "** (RuntimeError) oops",
+                   mechanism: %{handled: false, type: "generic"},
+                   stacktrace: %{type: "raw", frames: _frames}
+                 }
+               ]
+             } = properties
     end
 
     test "context is attached to throws", %{handler_ref: ref, sender_pid: sender_pid} do
@@ -65,21 +70,26 @@ defmodule LogHog.Integrations.PlugTest do
 
       assert %{
                event: "$exception",
-               properties: %{
-                 distinct_id: "unknown",
-                 "$current_url": "http://localhost/throw",
-                 "$host": "localhost",
-                 "$ip": "127.0.0.1",
-                 "$pathname": "/throw",
-                 "$exception_list": [
-                   %{
-                     type: "** (throw) \"catch!\"",
-                     value: "** (throw) \"catch!\"",
-                     mechanism: %{handled: true, type: "generic"}
-                   }
-                 ]
-               }
+               properties: properties
              } = event
+
+      assert %{
+               distinct_id: "unknown",
+               "$current_url": "http://localhost/throw",
+               "$host": "localhost",
+               "$ip": "127.0.0.1",
+               "$pathname": "/throw",
+               "$lib": "LogHog",
+               "$lib_version": "0.2.0",
+               "$exception_list": [
+                 %{
+                   type: "** (throw) \"catch!\"",
+                   value: "** (throw) \"catch!\"",
+                   mechanism: %{handled: false, type: "generic"},
+                   stacktrace: %{type: "raw", frames: _frames}
+                 }
+               ]
+             } = properties
     end
 
     test "context is attached to exit", %{handler_ref: ref, sender_pid: sender_pid} do
@@ -91,21 +101,25 @@ defmodule LogHog.Integrations.PlugTest do
 
       assert %{
                event: "$exception",
-               properties: %{
-                 distinct_id: "unknown",
-                 "$current_url": "http://localhost/exit",
-                 "$host": "localhost",
-                 "$ip": "127.0.0.1",
-                 "$pathname": "/exit",
-                 "$exception_list": [
-                   %{
-                     type: "** (exit) \"i quit\"",
-                     value: "** (exit) \"i quit\"",
-                     mechanism: %{handled: true, type: "generic"}
-                   }
-                 ]
-               }
+               properties: properties
              } = event
+
+      assert %{
+               distinct_id: "unknown",
+               "$current_url": "http://localhost/exit",
+               "$host": "localhost",
+               "$ip": "127.0.0.1",
+               "$pathname": "/exit",
+               "$lib": "LogHog",
+               "$lib_version": "0.2.0",
+               "$exception_list": [
+                 %{
+                   type: "** (exit) \"i quit\"",
+                   value: "** (exit) \"i quit\"",
+                   mechanism: %{handled: false, type: "generic"}
+                 }
+               ]
+             } = properties
     end
   end
 
@@ -118,21 +132,26 @@ defmodule LogHog.Integrations.PlugTest do
 
       assert %{
                event: "$exception",
-               properties: %{
-                 distinct_id: "unknown",
-                 "$current_url": "http://localhost/exception",
-                 "$host": "localhost",
-                 "$ip": "127.0.0.1",
-                 "$pathname": "/exception",
-                 "$exception_list": [
-                   %{
-                     type: "RuntimeError",
-                     value: "** (RuntimeError) oops",
-                     mechanism: %{handled: true, type: "generic"}
-                   }
-                 ]
-               }
+               properties: properties
              } = event
+
+      assert %{
+               distinct_id: "unknown",
+               "$current_url": "http://localhost/exception",
+               "$host": "localhost",
+               "$ip": "127.0.0.1",
+               "$pathname": "/exception",
+               "$lib": "LogHog",
+               "$lib_version": "0.2.0",
+               "$exception_list": [
+                 %{
+                   type: "RuntimeError",
+                   value: "** (RuntimeError) oops",
+                   mechanism: %{handled: false, type: "generic"},
+                   stacktrace: %{type: "raw", frames: _frames}
+                 }
+               ]
+             } = properties
     end
 
     test "context is attached to throws", %{handler_ref: ref, sender_pid: sender_pid} do
@@ -143,21 +162,26 @@ defmodule LogHog.Integrations.PlugTest do
 
       assert %{
                event: "$exception",
-               properties: %{
-                 distinct_id: "unknown",
-                 "$current_url": "http://localhost/throw",
-                 "$host": "localhost",
-                 "$ip": "127.0.0.1",
-                 "$pathname": "/throw",
-                 "$exception_list": [
-                   %{
-                     type: "** (throw) \"catch!\"",
-                     value: "** (throw) \"catch!\"",
-                     mechanism: %{handled: true, type: "generic"}
-                   }
-                 ]
-               }
+               properties: properties
              } = event
+
+      assert %{
+               distinct_id: "unknown",
+               "$current_url": "http://localhost/throw",
+               "$host": "localhost",
+               "$ip": "127.0.0.1",
+               "$pathname": "/throw",
+               "$lib": "LogHog",
+               "$lib_version": "0.2.0",
+               "$exception_list": [
+                 %{
+                   type: "** (throw) \"catch!\"",
+                   value: "** (throw) \"catch!\"",
+                   mechanism: %{handled: false, type: "generic"},
+                   stacktrace: %{type: "raw", frames: _frames}
+                 }
+               ]
+             } = properties
     end
 
     test "context is attached to exit", %{handler_ref: ref, sender_pid: sender_pid} do
@@ -168,21 +192,25 @@ defmodule LogHog.Integrations.PlugTest do
 
       assert %{
                event: "$exception",
-               properties: %{
-                 distinct_id: "unknown",
-                 "$current_url": "http://localhost/exit",
-                 "$host": "localhost",
-                 "$ip": "127.0.0.1",
-                 "$pathname": "/exit",
-                 "$exception_list": [
-                   %{
-                     type: "** (exit) \"i quit\"",
-                     value: "** (exit) \"i quit\"",
-                     mechanism: %{handled: true, type: "generic"}
-                   }
-                 ]
-               }
+               properties: properties
              } = event
+
+      assert %{
+               distinct_id: "unknown",
+               "$current_url": "http://localhost/exit",
+               "$host": "localhost",
+               "$ip": "127.0.0.1",
+               "$pathname": "/exit",
+               "$lib": "LogHog",
+               "$lib_version": "0.2.0",
+               "$exception_list": [
+                 %{
+                   type: "** (exit) \"i quit\"",
+                   value: "** (exit) \"i quit\"",
+                   mechanism: %{handled: false, type: "generic"}
+                 }
+               ]
+             } = properties
     end
   end
 end
