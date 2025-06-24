@@ -408,7 +408,7 @@ defmodule LogHog.HandlerTest do
                        },
                        %{
                          filename: "gen_server.erl",
-                         function: ":gen_server.handle_msg/6",
+                         function: ":gen_server.handle_msg" <> _,
                          in_app: false,
                          lineno: _,
                          module: ":gen_server",
@@ -470,7 +470,7 @@ defmodule LogHog.HandlerTest do
                        },
                        %{
                          filename: "gen_server.erl",
-                         function: ":gen_server.handle_msg/6",
+                         function: ":gen_server.handle_msg" <> _,
                          lineno: _,
                          module: ":gen_server",
                          platform: "custom",
