@@ -49,7 +49,7 @@ defmodule LogHog.Integrations.PlugTest do
                "$ip": "127.0.0.1",
                "$pathname": "/exception",
                "$lib": "LogHog",
-               "$lib_version": "0.2.0",
+               "$lib_version": _,
                "$exception_list": [
                  %{
                    type: "RuntimeError",
@@ -80,7 +80,7 @@ defmodule LogHog.Integrations.PlugTest do
                "$ip": "127.0.0.1",
                "$pathname": "/throw",
                "$lib": "LogHog",
-               "$lib_version": "0.2.0",
+               "$lib_version": _,
                "$exception_list": [
                  %{
                    type: "** (throw) \"catch!\"",
@@ -111,7 +111,7 @@ defmodule LogHog.Integrations.PlugTest do
                "$ip": "127.0.0.1",
                "$pathname": "/exit",
                "$lib": "LogHog",
-               "$lib_version": "0.2.0",
+               "$lib_version": _,
                "$exception_list": [
                  %{
                    type: "** (exit) \"i quit\"",
@@ -142,7 +142,7 @@ defmodule LogHog.Integrations.PlugTest do
                "$ip": "127.0.0.1",
                "$pathname": "/exception",
                "$lib": "LogHog",
-               "$lib_version": "0.2.0",
+               "$lib_version": _,
                "$exception_list": [
                  %{
                    type: "RuntimeError",
@@ -172,7 +172,7 @@ defmodule LogHog.Integrations.PlugTest do
                "$ip": "127.0.0.1",
                "$pathname": "/throw",
                "$lib": "LogHog",
-               "$lib_version": "0.2.0",
+               "$lib_version": _,
                "$exception_list": [
                  %{
                    type: "** (throw) \"catch!\"",
@@ -202,7 +202,7 @@ defmodule LogHog.Integrations.PlugTest do
                "$ip": "127.0.0.1",
                "$pathname": "/exit",
                "$lib": "LogHog",
-               "$lib_version": "0.2.0",
+               "$lib_version": _,
                "$exception_list": [
                  %{
                    type: "** (exit) \"i quit\"",

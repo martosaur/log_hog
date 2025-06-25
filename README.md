@@ -14,7 +14,7 @@ Add `LogHog` to the deps:
 ```elixir
 def deps do
   [
-    {:log_hog, "~> 0.2"}
+    {:log_hog, "~> 0.3"}
   ]
 end
 ```
