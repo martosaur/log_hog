@@ -27,55 +27,64 @@ defmodule LogHog.IntegrationTest do
     %{wait_fun: wait}
   end
 
-  setup %{test: test} do
-    Logger.metadata(distinct_id: test)
-  end
+  describe "error tracking" do
+    setup %{test: test} do
+      Logger.metadata(distinct_id: test)
+    end
 
-  test "log message", %{wait_fun: wait} do
-    Logger.info("Hello World!")
-    wait.()
-  end
+    test "log message", %{wait_fun: wait} do
+      Logger.info("Hello World!")
+      wait.()
+    end
 
-  test "genserver crash exception", %{wait_fun: wait} do
-    LoggerHandlerKit.Act.genserver_crash(:exception)
-    wait.()
-  end
+    test "genserver crash exception", %{wait_fun: wait} do
+      LoggerHandlerKit.Act.genserver_crash(:exception)
+      wait.()
+    end
 
-  test "task exception", %{wait_fun: wait} do
-    LoggerHandlerKit.Act.task_error(:exception)
-    wait.()
-  end
+    test "task exception", %{wait_fun: wait} do
+      LoggerHandlerKit.Act.task_error(:exception)
+      wait.()
+    end
 
-  test "task throw", %{wait_fun: wait} do
-    LoggerHandlerKit.Act.task_error(:throw)
-    wait.()
-  end
+    test "task throw", %{wait_fun: wait} do
+      LoggerHandlerKit.Act.task_error(:throw)
+      wait.()
+    end
 
-  test "task exit", %{wait_fun: wait} do
-    LoggerHandlerKit.Act.task_error(:exit)
-    wait.()
-  end
+    test "task exit", %{wait_fun: wait} do
+      LoggerHandlerKit.Act.task_error(:exit)
+      wait.()
+    end
 
-  test "exports metadata", %{wait_fun: wait} do
-    LoggerHandlerKit.Act.metadata_serialization(:all)
-    Logger.error("Error with metadata")
-    wait.()
-  end
+    test "exports metadata", %{wait_fun: wait} do
+      LoggerHandlerKit.Act.metadata_serialization(:all)
+      Logger.error("Error with metadata")
+      wait.()
+    end
 
-  test "supervisor report", %{wait_fun: wait} do
-    Application.stop(:logger)
-    Application.put_env(:logger, :handle_sasl_reports, true)
-    Application.put_env(:logger, :level, :info)
-    Application.start(:logger)
-
-    on_exit(fn ->
+    test "supervisor report", %{wait_fun: wait} do
       Application.stop(:logger)
-      Application.put_env(:logger, :handle_sasl_reports, false)
-      Application.delete_env(:logger, :level)
+      Application.put_env(:logger, :handle_sasl_reports, true)
+      Application.put_env(:logger, :level, :info)
       Application.start(:logger)
-    end)
 
-    LoggerHandlerKit.Act.supervisor_progress_report(:failed_to_start_child)
-    wait.()
+      on_exit(fn ->
+        Application.stop(:logger)
+        Application.put_env(:logger, :handle_sasl_reports, false)
+        Application.delete_env(:logger, :level)
+        Application.start(:logger)
+      end)
+
+      LoggerHandlerKit.Act.supervisor_progress_report(:failed_to_start_child)
+      wait.()
+    end
+  end
+
+  describe "event capture" do
+    test "captures event", %{test: test, wait_fun: wait} do
+      LogHog.capture("case tested", test, %{number: 1})
+      wait.()
+    end
   end
 end

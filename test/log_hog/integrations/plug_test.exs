@@ -4,6 +4,7 @@ defmodule LogHog.Integrations.PlugTest do
   @moduletag capture_log: true, config: [capture_level: :error]
 
   setup {LoggerHandlerKit.Arrange, :ensure_per_handler_translation}
+  setup :setup_supervisor
   setup :setup_logger_handler
 
   defmodule MyRouter do
@@ -43,7 +44,6 @@ defmodule LogHog.Integrations.PlugTest do
              } = event
 
       assert %{
-               distinct_id: "unknown",
                "$current_url": "http://localhost/exception",
                "$host": "localhost",
                "$ip": "127.0.0.1",
@@ -74,7 +74,6 @@ defmodule LogHog.Integrations.PlugTest do
              } = event
 
       assert %{
-               distinct_id: "unknown",
                "$current_url": "http://localhost/throw",
                "$host": "localhost",
                "$ip": "127.0.0.1",
@@ -105,7 +104,6 @@ defmodule LogHog.Integrations.PlugTest do
              } = event
 
       assert %{
-               distinct_id: "unknown",
                "$current_url": "http://localhost/exit",
                "$host": "localhost",
                "$ip": "127.0.0.1",
@@ -136,7 +134,6 @@ defmodule LogHog.Integrations.PlugTest do
              } = event
 
       assert %{
-               distinct_id: "unknown",
                "$current_url": "http://localhost/exception",
                "$host": "localhost",
                "$ip": "127.0.0.1",
@@ -166,7 +163,6 @@ defmodule LogHog.Integrations.PlugTest do
              } = event
 
       assert %{
-               distinct_id: "unknown",
                "$current_url": "http://localhost/throw",
                "$host": "localhost",
                "$ip": "127.0.0.1",
@@ -196,7 +192,6 @@ defmodule LogHog.Integrations.PlugTest do
              } = event
 
       assert %{
-               distinct_id: "unknown",
                "$current_url": "http://localhost/exit",
                "$host": "localhost",
                "$ip": "127.0.0.1",

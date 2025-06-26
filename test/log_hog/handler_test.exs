@@ -7,6 +7,7 @@ defmodule LogHog.HandlerTest do
   @moduletag capture_log: true
 
   setup {LoggerHandlerKit.Arrange, :ensure_per_handler_translation}
+  setup :setup_supervisor
   setup :setup_logger_handler
 
   test "takes distinct_id from metadata", %{handler_ref: ref, sender_pid: sender_pid} do
@@ -17,8 +18,8 @@ defmodule LogHog.HandlerTest do
 
     assert %{
              event: "$exception",
+             distinct_id: "foo",
              properties: %{
-               distinct_id: "foo",
                "$exception_list": [
                  %{
                    type: "Hello World",
@@ -70,7 +71,6 @@ defmodule LogHog.HandlerTest do
     assert %{
              event: "$exception",
              properties: %{
-               distinct_id: "unknown",
                "$exception_list": [
                  %{
                    type: "** (exit) \"exit reason\"",
@@ -427,8 +427,7 @@ defmodule LogHog.HandlerTest do
                      ]
                    }
                  }
-               ],
-               distinct_id: "unknown"
+               ]
              }
            } = event
   end
@@ -581,8 +580,7 @@ defmodule LogHog.HandlerTest do
                      type: "raw"
                    }
                  }
-               ],
-               distinct_id: "unknown"
+               ]
              }
            } = event
   end
@@ -620,8 +618,7 @@ defmodule LogHog.HandlerTest do
                      type: "raw"
                    }
                  }
-               ],
-               distinct_id: "unknown"
+               ]
              }
            } = event
   end
@@ -923,7 +920,6 @@ defmodule LogHog.HandlerTest do
     assert %{
              event: "$exception",
              properties: %{
-               distinct_id: "unknown",
                foo: "bar",
                "$exception_list": [
                  %{

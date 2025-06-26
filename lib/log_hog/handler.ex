@@ -8,24 +8,34 @@ defmodule LogHog.Handler do
 
   @impl :logger_handler
   def log(log_event, %{config: config}) do
-    cond do
-      get_in(log_event, [:meta, :crash_reason]) ->
-        event = to_event(log_event, config)
-        LogHog.Sender.send(event, config.supervisor_name)
+    maybe_properties =
+      cond do
+        get_in(log_event, [:meta, :crash_reason]) ->
+          properties(log_event, config)
 
-      is_nil(config.capture_level) ->
-        :ok
+        is_nil(config.capture_level) ->
+          nil
 
-      Logger.compare_levels(log_event.level, config.capture_level) in [:gt, :eq] ->
-        event = to_event(log_event, config)
-        LogHog.Sender.send(event, config.supervisor_name)
+        Logger.compare_levels(log_event.level, config.capture_level) in [:gt, :eq] ->
+          properties(log_event, config)
 
-      true ->
-        :ok
+        true ->
+          nil
+      end
+
+    with %{} = properties <- maybe_properties do
+      LogHog.capture(
+        config.supervisor_name,
+        "$exception",
+        Map.get(properties, :distinct_id, "unknown"),
+        properties
+      )
     end
+
+    :ok
   end
 
-  defp to_event(log_event, config) do
+  defp properties(log_event, config) do
     exception =
       Enum.reduce(
         [&type/1, &value/1, &stacktrace(&1, config.in_app_modules)],
@@ -43,18 +53,10 @@ defmodule LogHog.Handler do
       |> Map.drop(["$exception_list"])
       |> LoggerJSON.Formatter.RedactorEncoder.encode([])
 
-    %{
-      event: "$exception",
-      properties:
-        Context.get()
-        |> Map.merge(config.global_context)
-        |> enrich_context(log_event)
-        |> Map.merge(%{
-          distinct_id: "unknown",
-          "$exception_list": [exception]
-        })
-        |> Map.merge(metadata)
-    }
+    Context.get()
+    |> enrich_context(log_event)
+    |> Map.put(:"$exception_list", [exception])
+    |> Map.merge(metadata)
   end
 
   defp type(log_event) do
