@@ -52,4 +52,20 @@ defmodule LogHog do
 
     LogHog.Sender.send(event, name)
   end
+
+  def get_feature_flag(name \\ __MODULE__, distinct_id_or_body) do
+    body =
+      case distinct_id_or_body do
+        %{} = body -> body
+        distinct_id -> %{distinct_id: distinct_id}
+      end
+
+    config = config(name)
+
+    case LogHog.API.flags(config.api_client, body) do
+      {:ok, %{status: 200, body: body}} -> {:ok, body}
+      {:ok, resp} -> {:error, resp}
+      {:error, error} -> {:error, error}
+    end
+  end
 end
