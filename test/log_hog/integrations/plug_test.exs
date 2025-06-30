@@ -22,7 +22,7 @@ defmodule LogHog.Integrations.PlugTest do
     conn = Plug.Test.conn(:get, "https://posthog.com/foo?bar=10")
     assert LogHog.Integrations.Plug.call(conn, nil)
 
-    assert LogHog.Context.get() == %{
+    assert LogHog.Context.get(:all, "$exception") == %{
              "$current_url": "https://posthog.com/foo?bar=10",
              "$host": "posthog.com",
              "$ip": "127.0.0.1",

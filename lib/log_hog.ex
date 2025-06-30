@@ -68,4 +68,81 @@ defmodule LogHog do
       {:error, error} -> {:error, error}
     end
   end
+
+  @doc """
+  Set context for the current process.
+
+  ## Examples
+
+  Set and retrieve context for current process:
+
+      > LogHog.set_context(%{foo: "bar"})
+      > LogHog.get_context()
+      %{foo: "bar"}
+
+  Set and retrieve context for a named LogHog instance:
+
+      > LogHog.set_context(MyLogHog, %{foo: "bar"})
+      > LogHog.get_context(MyLogHog)
+      %{foo: "bar"}
+  """
+  def set_context(name \\ __MODULE__, context), do: LogHog.Context.set(name, :all, context)
+
+  @doc """
+  Set context for the current process scoped for a specific event.
+
+  ## Examples
+
+  Set and retrieve context scoped for event:
+
+      > LogHog.set_event_context("$exception", %{foo: "bar"})
+      > LogHog.get_event_context("$exception")
+      %{foo: "bar"}
+     
+  Set and retrieve context for a specific event through a named LogHog instance:
+
+      > LogHog.set_event_context(MyLogHog, "$exception", %{foo: "bar"})
+      > LogHog.get_event_context(MyLogHog, "$exception")
+      %{foo: "bar"}
+  """
+  def set_event_context(name \\ __MODULE__, event, context),
+    do: LogHog.Context.set(name, event, context)
+
+  @doc """
+  Retrieves context for the current process.
+
+  ## Examples
+
+  Set and retrieve context for current process:
+
+      > LogHog.set_context(%{foo: "bar"})
+      > LogHog.get_context()
+      %{foo: "bar"}
+      
+  Set and retrieve context for a named LogHog instance:
+
+      > LogHog.set_context(MyLogHog, %{foo: "bar"})
+      > LogHog.get_context(MyLogHog)
+      %{foo: "bar"}
+  """
+  def get_context(name \\ __MODULE__), do: LogHog.Context.get(name, :all)
+
+  @doc """
+  Retrieves context for the current process scoped for a specific event.
+
+  ## Examples
+
+  Set and retrieve context scoped for event:
+
+      > LogHog.set_event_context("$exception", %{foo: "bar"})
+      > LogHog.get_event_context("$exception")
+      %{foo: "bar"}
+     
+  Set and retrieve context for a specific event through a named LogHog instance:
+
+      > LogHog.set_event_context(MyLogHog, "$exception", %{foo: "bar"})
+      > LogHog.get_event_context(MyLogHog, "$exception")
+      %{foo: "bar"}
+  """
+  def get_event_context(name \\ __MODULE__, event), do: LogHog.Context.get(name, event)
 end

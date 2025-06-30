@@ -135,4 +135,40 @@ defmodule LogHogTest do
       assert {:ok, %{}} = LogHog.get_feature_flag(MyLogHog, "foo")
     end
   end
+
+  describe "set_context/2 + get_context/2" do
+    test "default scope" do
+      LogHog.set_context(%{foo: "bar"})
+      assert LogHog.get_context() == %{foo: "bar"}
+      assert LogHog.get_context(LogHog) == %{foo: "bar"}
+      assert LogHog.get_event_context("$exception") == %{foo: "bar"}
+      assert LogHog.get_event_context(LogHog, "$exception") == %{foo: "bar"}
+    end
+
+    test "named scope, all events" do
+      LogHog.set_context(MyLogHog, %{foo: "bar"})
+      assert LogHog.get_context() == %{}
+      assert LogHog.get_event_context("$exception") == %{}
+      assert LogHog.get_context(MyLogHog) == %{foo: "bar"}
+      assert LogHog.get_event_context(MyLogHog, "$exception") == %{foo: "bar"}
+    end
+  end
+
+  describe "set_event_context/2 + get_event_context/2" do
+    test "default scope" do
+      LogHog.set_event_context("$exception", %{foo: "bar"})
+      assert LogHog.get_context() == %{}
+      assert LogHog.get_event_context("$exception") == %{foo: "bar"}
+      assert LogHog.get_context(LogHog) == %{}
+      assert LogHog.get_event_context(LogHog, "$exception") == %{foo: "bar"}
+    end
+
+    test "named scope" do
+      LogHog.set_event_context(MyLogHog, "$exception", %{foo: "bar"})
+      assert LogHog.get_context() == %{}
+      assert LogHog.get_event_context("$exception") == %{}
+      assert LogHog.get_context(MyLogHog) == %{}
+      assert LogHog.get_event_context(MyLogHog, "$exception") == %{foo: "bar"}
+    end
+  end
 end

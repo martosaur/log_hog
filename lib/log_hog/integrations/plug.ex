@@ -25,9 +25,8 @@ defmodule LogHog.Integrations.Plug do
 
   @doc false
   def call(conn, _opts) do
-    conn
-    |> conn_to_context()
-    |> LogHog.Context.set()
+    context = conn_to_context(conn)
+    LogHog.Context.set(:all, "$exception", context)
 
     conn
   end
