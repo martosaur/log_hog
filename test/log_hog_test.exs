@@ -21,9 +21,9 @@ defmodule LogHogTest do
     end
   end
 
-  describe "capture/4" do
+  describe "bare_capture/4" do
     test "simple call", %{sender_pid: sender_pid} do
-      LogHog.capture("case tested", "distinct_id")
+      LogHog.bare_capture("case tested", "distinct_id")
 
       assert %{events: [event]} = :sys.get_state(sender_pid)
 
@@ -36,7 +36,7 @@ defmodule LogHogTest do
     end
 
     test "with properties", %{sender_pid: sender_pid} do
-      LogHog.capture("case tested", "distinct_id", %{foo: "bar"})
+      LogHog.bare_capture("case tested", "distinct_id", %{foo: "bar"})
 
       assert %{events: [event]} = :sys.get_state(sender_pid)
 
@@ -50,7 +50,7 @@ defmodule LogHogTest do
 
     @tag config: [supervisor_name: CustomLogHog]
     test "simple call for custom supervisor", %{sender_pid: sender_pid} do
-      LogHog.capture(CustomLogHog, "case tested", "distinct_id")
+      LogHog.bare_capture(CustomLogHog, "case tested", "distinct_id")
 
       assert %{events: [event]} = :sys.get_state(sender_pid)
 
@@ -64,7 +64,7 @@ defmodule LogHogTest do
 
     @tag config: [supervisor_name: CustomLogHog]
     test "with properties for custom supervisor", %{sender_pid: sender_pid} do
-      LogHog.capture(CustomLogHog, "case tested", "distinct_id", %{foo: "bar"})
+      LogHog.bare_capture(CustomLogHog, "case tested", "distinct_id", %{foo: "bar"})
 
       assert %{events: [event]} = :sys.get_state(sender_pid)
 
@@ -72,6 +72,96 @@ defmodule LogHogTest do
                event: "case tested",
                distinct_id: "distinct_id",
                properties: %{foo: "bar"},
+               timestamp: _
+             } = event
+    end
+
+    test "ignores set context but uses global one from the config", %{sender_pid: sender_pid} do
+      LogHog.set_context(%{hello: "world"})
+      LogHog.bare_capture("case tested", "distinct_id", %{foo: "bar"})
+
+      assert %{events: [%{properties: properties}]} = :sys.get_state(sender_pid)
+
+      assert %{foo: "bar", "$lib": "LogHog", "$lib_version": _} = properties
+      refute properties[:hello]
+    end
+  end
+
+  describe "capture/4" do
+    test "simple call", %{sender_pid: sender_pid} do
+      LogHog.capture("case tested", %{distinct_id: "distinct_id"})
+
+      assert %{events: [event]} = :sys.get_state(sender_pid)
+
+      assert %{
+               event: "case tested",
+               distinct_id: "distinct_id",
+               properties: %{},
+               timestamp: _
+             } = event
+    end
+
+    test "distinct_id is required" do
+      assert {:error, :missing_distinct_id} = LogHog.capture("case tested")
+    end
+
+    test "with properties", %{sender_pid: sender_pid} do
+      LogHog.capture("case tested", %{distinct_id: "distinct_id", foo: "bar"})
+
+      assert %{events: [event]} = :sys.get_state(sender_pid)
+
+      assert %{
+               event: "case tested",
+               distinct_id: "distinct_id",
+               properties: %{foo: "bar"},
+               timestamp: _
+             } = event
+    end
+
+    @tag config: [supervisor_name: CustomLogHog]
+    test "simple call for custom supervisor", %{sender_pid: sender_pid} do
+      LogHog.capture(CustomLogHog, "case tested", %{distinct_id: "distinct_id"})
+
+      assert %{events: [event]} = :sys.get_state(sender_pid)
+
+      assert %{
+               event: "case tested",
+               distinct_id: "distinct_id",
+               properties: %{},
+               timestamp: _
+             } = event
+    end
+
+    @tag config: [supervisor_name: CustomLogHog]
+    test "with properties for custom supervisor", %{sender_pid: sender_pid} do
+      LogHog.capture(CustomLogHog, "case tested", %{distinct_id: "distinct_id", foo: "bar"})
+
+      assert %{events: [event]} = :sys.get_state(sender_pid)
+
+      assert %{
+               event: "case tested",
+               distinct_id: "distinct_id",
+               properties: %{foo: "bar"},
+               timestamp: _
+             } = event
+    end
+
+    test "includes relevant event context", %{sender_pid: sender_pid} do
+      LogHog.set_context(%{hello: "world", distinct_id: "distinct_id"})
+      LogHog.set_event_context("case tested", %{foo: "bar"})
+      LogHog.set_context(MyLogHog, %{spam: "eggs"})
+      LogHog.capture("case tested", %{final: "override"})
+
+      assert %{events: [event]} = :sys.get_state(sender_pid)
+
+      assert %{
+               event: "case tested",
+               distinct_id: "distinct_id",
+               properties: %{
+                 hello: "world",
+                 foo: "bar",
+                 final: "override"
+               },
                timestamp: _
              } = event
     end

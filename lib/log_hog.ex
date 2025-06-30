@@ -15,11 +15,11 @@ defmodule LogHog do
   def config(name \\ __MODULE__), do: LogHog.Registry.config(name)
 
   @doc false
-  def capture(event, distinct_id, %{} = properties),
-    do: capture(__MODULE__, event, distinct_id, properties)
+  def bare_capture(event, distinct_id, %{} = properties),
+    do: bare_capture(__MODULE__, event, distinct_id, properties)
 
   @doc """
-  Captures a single event
+  Captures a single event without retrieving properties from context.
 
   Capture is a relatively lightweight operation. The event is prepared
   synchronously and then sent to LogHog workers to be batched together with
@@ -29,17 +29,17 @@ defmodule LogHog do
 
   Capture simple event:
 
-      LogHog.capture("event captured", "user123")
+      LogHog.bare_capture("event captured", "user123")
       
   Capture event with properies:
 
-      LogHog.capture("event captures", "user123", %{backend: "Phoenix"})
+      LogHog.bare_capture("event captures", "user123", %{backend: "Phoenix"})
       
   Capture through a named LogHog instance:
 
-      LogHog.capture(MyLogHog, "event_captures", "user123")
+      LogHog.bare_capture(MyLogHog, "event_captures", "user123")
   """
-  def capture(name \\ __MODULE__, event, distinct_id, properties \\ %{}) do
+  def bare_capture(name \\ __MODULE__, event, distinct_id, properties \\ %{}) do
     config = LogHog.Registry.config(name)
     properties = Map.merge(properties, config.global_properties)
 
@@ -51,6 +51,40 @@ defmodule LogHog do
     }
 
     LogHog.Sender.send(event, name)
+  end
+
+  @doc false
+  def capture(event, %{} = properties),
+    do: capture(__MODULE__, event, properties)
+
+  @doc """
+  Captures a single event.
+
+  Any context previously set will be included in the event properties. Note that
+  `distinct_id` is still required.
+
+  ## Examples
+
+  Set context and capture event:
+
+      LogHog.set_context(%{distinct_id: "user123", "$feature/my-feature-flag": true})
+      LogHog.capture("job started", %{job_name: "JobName"})
+      
+  Set context and capture event through a named LogHog instance:
+
+      LogHog.set_context(MyLogHog, %{distinct_id: "user123", "$feature/my-feature-flag": true})
+      LogHog.capture(MyLogHog, "job started", %{job_name: "JobName"})
+  """
+  def capture(name \\ __MODULE__, event, properties \\ %{}) do
+    context =
+      name
+      |> get_event_context(event)
+      |> Map.merge(properties)
+
+    case Map.pop(context, :distinct_id) do
+      {nil, _} -> {:error, :missing_distinct_id}
+      {distinct_id, properties} -> bare_capture(name, event, distinct_id, properties)
+    end
   end
 
   def get_feature_flag(name \\ __MODULE__, distinct_id_or_body) do
