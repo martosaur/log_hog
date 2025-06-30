@@ -1,5 +1,7 @@
 defmodule LogHog.Integrations.PlugTest do
-  use LogHog.Case, async: true
+  # This unfortunately will be flaky in async mode until
+  # https://github.com/erlang/otp/issues/9997 is fixed
+  use LogHog.Case, async: false
 
   @moduletag capture_log: true, config: [capture_level: :error]
 

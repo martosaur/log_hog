@@ -24,7 +24,7 @@ defmodule LogHog.Handler do
       end
 
     with %{} = properties <- maybe_properties do
-      LogHog.capture(
+      LogHog.bare_capture(
         config.supervisor_name,
         "$exception",
         Map.get(properties, :distinct_id, "unknown"),
