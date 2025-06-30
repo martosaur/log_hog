@@ -2,7 +2,6 @@ defmodule LogHog.HandlerTest do
   use LogHog.Case, async: true
 
   require Logger
-  alias LogHog.Context
 
   @moduletag capture_log: true
 
@@ -910,8 +909,12 @@ defmodule LogHog.HandlerTest do
   end
 
   @tag config: [metadata: [:extra]]
-  test "purposefully set context is always exported", %{handler_ref: ref, sender_pid: sender_pid} do
-    Context.set(%{foo: "bar"})
+  test "purposefully set context is always exported", %{
+    config: config,
+    handler_ref: ref,
+    sender_pid: sender_pid
+  } do
+    LogHog.set_context(config.supervisor_name, %{foo: "bar"})
     Logger.error("Error with metadata", hello: "world")
     LoggerHandlerKit.Assert.assert_logged(ref)
 

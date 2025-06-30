@@ -53,7 +53,7 @@ defmodule LogHog.Handler do
       |> Map.drop(["$exception_list"])
       |> LoggerJSON.Formatter.RedactorEncoder.encode([])
 
-    Context.get()
+    Context.get(config.supervisor_name, "$exception")
     |> enrich_context(log_event)
     |> Map.put(:"$exception_list", [exception])
     |> Map.merge(metadata)
