@@ -1,8 +1,24 @@
 defmodule LogHog do
-  @doc """
-  Returns configuration map for a named `LogHog` supervisor
+  @typedoc "Name under which an instance of LogHog supervision tree is registered."
+  @type supervisor_name() :: atom()
 
-  ## Example
+  @typedoc "Event name, such as `\"user_signed_up\"` or `\"$create_alias\"`"
+  @type event() :: String.t()
+
+  @typedoc "string representing distinct ID"
+  @type distinct_id() :: String.t()
+
+  @typedoc """
+  Map representing event properties.
+
+  Note that it __must__ be JSON-serializable.
+  """
+  @type properties() :: %{optional(String.t()) => any(), optional(atom()) => any()}
+
+  @doc """
+  Returns the configuration map for a named `LogHog` supervisor.
+
+  ## Examples
 
   Retrieve the default `LogHog` instance config:
 
@@ -12,6 +28,7 @@ defmodule LogHog do
 
       %{supervisor_name: MyLogHog} = LogHog.config(MyLogHog)
   """
+  @spec config(supervisor_name()) :: LogHog.Config.config()
   def config(name \\ __MODULE__), do: LogHog.Registry.config(name)
 
   @doc false
@@ -27,18 +44,19 @@ defmodule LogHog do
 
   ## Examples
 
-  Capture simple event:
+  Capture a simple event:
 
-      LogHog.bare_capture("event captured", "user123")
+      LogHog.bare_capture("event_captured", "user123")
       
-  Capture event with properies:
+  Capture an event with properties:
 
-      LogHog.bare_capture("event captures", "user123", %{backend: "Phoenix"})
+      LogHog.bare_capture("event_captured", "user123", %{backend: "Phoenix"})
       
   Capture through a named LogHog instance:
 
-      LogHog.bare_capture(MyLogHog, "event_captures", "user123")
+      LogHog.bare_capture(MyLogHog, "event_captured", "user123")
   """
+  @spec bare_capture(supervisor_name(), event(), distinct_id(), properties()) :: :ok
   def bare_capture(name \\ __MODULE__, event, distinct_id, properties \\ %{}) do
     config = LogHog.Registry.config(name)
     properties = Map.merge(properties, config.global_properties)
@@ -65,16 +83,17 @@ defmodule LogHog do
 
   ## Examples
 
-  Set context and capture event:
+  Set context and capture an event:
 
       LogHog.set_context(%{distinct_id: "user123", "$feature/my-feature-flag": true})
-      LogHog.capture("job started", %{job_name: "JobName"})
+      LogHog.capture("job_started", %{job_name: "JobName"})
       
-  Set context and capture event through a named LogHog instance:
+  Set context and capture an event through a named LogHog instance:
 
       LogHog.set_context(MyLogHog, %{distinct_id: "user123", "$feature/my-feature-flag": true})
-      LogHog.capture(MyLogHog, "job started", %{job_name: "JobName"})
+      LogHog.capture(MyLogHog, "job_started", %{job_name: "JobName"})
   """
+  @spec capture(supervisor_name(), event(), properties()) :: :ok | {:error, :missing_distinct_id}
   def capture(name \\ __MODULE__, event, properties \\ %{}) do
     context =
       name
@@ -87,6 +106,7 @@ defmodule LogHog do
     end
   end
 
+  @spec get_feature_flag(supervisor_name(), distinct_id() | map()) :: LogHog.API.Client.response()
   def get_feature_flag(name \\ __MODULE__, distinct_id_or_body) do
     body =
       case distinct_id_or_body do
@@ -95,20 +115,15 @@ defmodule LogHog do
       end
 
     config = config(name)
-
-    case LogHog.API.flags(config.api_client, body) do
-      {:ok, %{status: 200, body: body}} -> {:ok, body}
-      {:ok, resp} -> {:error, resp}
-      {:error, error} -> {:error, error}
-    end
+    LogHog.API.flags(config.api_client, body)
   end
 
   @doc """
-  Set context for the current process.
+  Sets context for the current process.
 
   ## Examples
 
-  Set and retrieve context for current process:
+  Set and retrieve context for the current process:
 
       > LogHog.set_context(%{foo: "bar"})
       > LogHog.get_context()
@@ -120,14 +135,15 @@ defmodule LogHog do
       > LogHog.get_context(MyLogHog)
       %{foo: "bar"}
   """
+  @spec set_context(supervisor_name(), properties()) :: :ok
   def set_context(name \\ __MODULE__, context), do: LogHog.Context.set(name, :all, context)
 
   @doc """
-  Set context for the current process scoped for a specific event.
+  Sets context for the current process scoped to a specific event.
 
   ## Examples
 
-  Set and retrieve context scoped for event:
+  Set and retrieve context scoped to an event:
 
       > LogHog.set_event_context("$exception", %{foo: "bar"})
       > LogHog.get_event_context("$exception")
@@ -139,6 +155,7 @@ defmodule LogHog do
       > LogHog.get_event_context(MyLogHog, "$exception")
       %{foo: "bar"}
   """
+  @spec set_event_context(supervisor_name(), event(), properties()) :: :ok
   def set_event_context(name \\ __MODULE__, event, context),
     do: LogHog.Context.set(name, event, context)
 
@@ -159,14 +176,15 @@ defmodule LogHog do
       > LogHog.get_context(MyLogHog)
       %{foo: "bar"}
   """
+  @spec get_context(supervisor_name()) :: properties()
   def get_context(name \\ __MODULE__), do: LogHog.Context.get(name, :all)
 
   @doc """
-  Retrieves context for the current process scoped for a specific event.
+  Retrieves context for the current process scoped to a specific event.
 
   ## Examples
 
-  Set and retrieve context scoped for event:
+  Set and retrieve context scoped to an event:
 
       > LogHog.set_event_context("$exception", %{foo: "bar"})
       > LogHog.get_event_context("$exception")
@@ -178,5 +196,6 @@ defmodule LogHog do
       > LogHog.get_event_context(MyLogHog, "$exception")
       %{foo: "bar"}
   """
+  @spec get_event_context(supervisor_name()) :: properties()
   def get_event_context(name \\ __MODULE__, event), do: LogHog.Context.get(name, event)
 end
