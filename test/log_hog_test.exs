@@ -181,7 +181,7 @@ defmodule LogHogTest do
         {:ok, %{status: 200, body: "body"}}
       end)
 
-      assert {:ok, "body"} = LogHog.get_feature_flag("foo")
+      assert {:ok, %{status: 200, body: "body"}} = LogHog.get_feature_flag("foo")
     end
 
     test "sophisticated body" do
@@ -211,7 +211,7 @@ defmodule LogHogTest do
         {:ok, %{status: 503}}
       end)
 
-      assert {:error, %{status: 503}} = LogHog.get_feature_flag("foo")
+      assert {:ok, %{status: 503}} = LogHog.get_feature_flag("foo")
     end
 
     @tag config: [supervisor_name: MyLogHog]

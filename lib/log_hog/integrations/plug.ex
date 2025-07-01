@@ -7,7 +7,7 @@ defmodule LogHog.Integrations.Plug do
 
       plug LogHog.Integrations.Plug
       
-  For Plug apps, add it directly into your Router:
+  For Plug apps, add it directly to your router:
 
       defmodule MyRouterPlug do
         use Plug.Router
@@ -51,7 +51,7 @@ defmodule LogHog.Integrations.Plug do
   end
 
   defp remote_ip(conn) when is_struct(conn, Plug.Conn) do
-    # Avoid compilation warning for cases where Plug isn't available
+    # Avoid compilation warnings for cases where Plug isn't available
     remote_ip =
       case apply(Plug.Conn, :get_req_header, [conn, "x-forwarded-for"]) do
         [x_forwarded_for | _] ->
