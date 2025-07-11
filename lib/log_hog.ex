@@ -136,7 +136,7 @@ defmodule LogHog do
       %{foo: "bar"}
   """
   @spec set_context(supervisor_name(), properties()) :: :ok
-  def set_context(name \\ __MODULE__, context), do: LogHog.Context.set(name, :all, context)
+  defdelegate set_context(name \\ __MODULE__, context), to: LogHog.Context, as: :set
 
   @doc """
   Sets context for the current process scoped to a specific event.
@@ -177,7 +177,7 @@ defmodule LogHog do
       %{foo: "bar"}
   """
   @spec get_context(supervisor_name()) :: properties()
-  def get_context(name \\ __MODULE__), do: LogHog.Context.get(name, :all)
+  defdelegate get_context(name \\ __MODULE__), to: LogHog.Context, as: :get
 
   @doc """
   Retrieves context for the current process scoped to a specific event.

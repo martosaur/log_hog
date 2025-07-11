@@ -3,7 +3,7 @@ defmodule LogHog.Context do
 
   @logger_metadata_key :__loghog__
 
-  def set(name_scope, event_scope, context) do
+  def set(name_scope, event_scope \\ :all, context) do
     metadata =
       with :undefined <- :logger.get_process_metadata(), do: %{}
 
@@ -25,7 +25,7 @@ defmodule LogHog.Context do
     :logger.update_process_metadata(%{@logger_metadata_key => updated_context})
   end
 
-  def get(name_scope, event_scope) do
+  def get(name_scope, event_scope \\ :all) do
     case :logger.get_process_metadata() do
       %{@logger_metadata_key => context} ->
         get_in(context, [key_and_all(name_scope), key_and_all(event_scope)]) |> Map.new()
