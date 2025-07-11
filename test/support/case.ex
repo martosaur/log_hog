@@ -7,7 +7,7 @@ defmodule LogHog.Case do
     end
   end
 
-  def setup_logger_handler(context) do
+  def setup_supervisor(context) do
     Mox.stub_with(LogHog.API.Mock, LogHog.API.Stub)
 
     config =
@@ -24,8 +24,16 @@ defmodule LogHog.Case do
       |> Map.put(:max_batch_events, 100)
 
     start_link_supervised!({LogHog.Supervisor, config})
-    sender_pid = context.test |> LogHog.Registry.via(LogHog.Sender) |> GenServer.whereis()
 
+    sender_pid =
+      config.supervisor_name |> LogHog.Registry.via(LogHog.Sender) |> GenServer.whereis()
+
+    context
+    |> Map.put(:config, config)
+    |> Map.put(:sender_pid, sender_pid)
+  end
+
+  def setup_logger_handler(%{config: config} = context) do
     big_config_override = Map.take(context, [:handle_otp_reports, :handle_sasl_reports, :level])
 
     {context, on_exit} =
@@ -37,6 +45,6 @@ defmodule LogHog.Case do
       )
 
     on_exit(on_exit)
-    Map.put(context, :sender_pid, sender_pid)
+    context
   end
 end

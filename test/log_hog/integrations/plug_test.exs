@@ -1,9 +1,12 @@
 defmodule LogHog.Integrations.PlugTest do
-  use LogHog.Case, async: true
+  # This unfortunately will be flaky in async mode until
+  # https://github.com/erlang/otp/issues/9997 is fixed
+  use LogHog.Case, async: false
 
   @moduletag capture_log: true, config: [capture_level: :error]
 
   setup {LoggerHandlerKit.Arrange, :ensure_per_handler_translation}
+  setup :setup_supervisor
   setup :setup_logger_handler
 
   defmodule MyRouter do
@@ -21,7 +24,7 @@ defmodule LogHog.Integrations.PlugTest do
     conn = Plug.Test.conn(:get, "https://posthog.com/foo?bar=10")
     assert LogHog.Integrations.Plug.call(conn, nil)
 
-    assert LogHog.Context.get() == %{
+    assert LogHog.Context.get(:all, "$exception") == %{
              "$current_url": "https://posthog.com/foo?bar=10",
              "$host": "posthog.com",
              "$ip": "127.0.0.1",
@@ -43,7 +46,6 @@ defmodule LogHog.Integrations.PlugTest do
              } = event
 
       assert %{
-               distinct_id: "unknown",
                "$current_url": "http://localhost/exception",
                "$host": "localhost",
                "$ip": "127.0.0.1",
@@ -74,7 +76,6 @@ defmodule LogHog.Integrations.PlugTest do
              } = event
 
       assert %{
-               distinct_id: "unknown",
                "$current_url": "http://localhost/throw",
                "$host": "localhost",
                "$ip": "127.0.0.1",
@@ -105,7 +106,6 @@ defmodule LogHog.Integrations.PlugTest do
              } = event
 
       assert %{
-               distinct_id: "unknown",
                "$current_url": "http://localhost/exit",
                "$host": "localhost",
                "$ip": "127.0.0.1",
@@ -136,7 +136,6 @@ defmodule LogHog.Integrations.PlugTest do
              } = event
 
       assert %{
-               distinct_id: "unknown",
                "$current_url": "http://localhost/exception",
                "$host": "localhost",
                "$ip": "127.0.0.1",
@@ -166,7 +165,6 @@ defmodule LogHog.Integrations.PlugTest do
              } = event
 
       assert %{
-               distinct_id: "unknown",
                "$current_url": "http://localhost/throw",
                "$host": "localhost",
                "$ip": "127.0.0.1",
@@ -196,7 +194,6 @@ defmodule LogHog.Integrations.PlugTest do
              } = event
 
       assert %{
-               distinct_id: "unknown",
                "$current_url": "http://localhost/exit",
                "$host": "localhost",
                "$ip": "127.0.0.1",

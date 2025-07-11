@@ -6,8 +6,10 @@ defmodule LogHog.Application do
   def start(_type, _args) do
     children =
       case LogHog.Config.read!() do
-        %{enable: true} = config ->
-          :logger.add_handler(:log_hog, LogHog.Handler, %{config: config})
+        {%{enable: true, enable_error_tracking: error_tracking}, config} ->
+          if error_tracking do
+            :logger.add_handler(:log_hog, LogHog.Handler, %{config: config})
+          end
 
           [{LogHog.Supervisor, config}]
 

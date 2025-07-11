@@ -26,7 +26,10 @@ defmodule LogHog.Supervisor do
   def init({config, callers}) do
     children =
       [
-        {Registry, keys: :unique, name: LogHog.Registry.registry_name(config.supervisor_name)},
+        {Registry,
+         keys: :unique,
+         name: LogHog.Registry.registry_name(config.supervisor_name),
+         meta: [config: config]},
         {LogHog.Sender,
          [
            api_client: config.api_client,

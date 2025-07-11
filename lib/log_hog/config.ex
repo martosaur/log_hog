@@ -1,10 +1,5 @@
 defmodule LogHog.Config do
   @configuration_schema [
-    enable: [
-      type: :boolean,
-      default: true,
-      doc: "Automatically start LogHog?"
-    ],
     public_url: [
       type: :string,
       required: true,
@@ -14,13 +9,13 @@ defmodule LogHog.Config do
       type: :string,
       required: true,
       doc: """
-      Your PostHog Project API key. Find it in your project's settings under Project ID section
+      Your PostHog Project API key. Find it in your project's settings under the Project ID section.
       """
     ],
     api_client_module: [
       type: :atom,
       default: LogHog.API.Client,
-      doc: "API Client to use"
+      doc: "API client to use"
     ],
     supervisor_name: [
       type: :atom,
@@ -42,52 +37,86 @@ defmodule LogHog.Config do
       type: {:list, :atom},
       default: [],
       doc:
-        "List of OTP app names of your applications. Stacktrace entries that belong to these apps will be marked as \"in_app\""
+        "List of OTP app names of your applications. Stacktrace entries that belong to these apps will be marked as \"in_app\"."
     ]
   ]
 
-  @compiled_schema NimbleOptions.new!(@configuration_schema)
+  @convenience_schema [
+    enable: [
+      type: :boolean,
+      default: true,
+      doc: "Automatically start LogHog?"
+    ],
+    enable_error_tracking: [
+      type: :boolean,
+      default: true,
+      doc: "Automatically start the logger handler for error tracking?"
+    ]
+  ]
+
+  @compiled_configuration_schema NimbleOptions.new!(@configuration_schema)
+  @compiled_convenience_schema NimbleOptions.new!(@convenience_schema)
 
   @moduledoc """
   LogHog configuration
 
   ## Configuration Schema
 
-  #{NimbleOptions.docs(@compiled_schema)}
+  ### Application Configuration
+
+  These are convenience options that only affect how LogHog's own application behaves.
+
+  #{NimbleOptions.docs(@compiled_convenience_schema)}
+
+  ### Supervisor Configuration
+
+  This is the main options block that configures each supervision tree instance.
+
+  #{NimbleOptions.docs(@compiled_configuration_schema)}
   """
 
-  @type config() :: map()
+  @typedoc """
+  Map containing valid configuration.
 
-  @doc """
-  Reads and validates config from global application configuration
+  It mostly follows `t:options/0`, but the internal structure shouldn't be relied upon.
   """
-  @spec read!() :: config()
+  @opaque config() :: map()
+
+  @type options() :: unquote(NimbleOptions.option_typespec(@compiled_configuration_schema))
+
+  @doc false
   def read!() do
-    raw_options =
+    configuration_options =
       Application.get_all_env(:log_hog) |> Keyword.take(Keyword.keys(@configuration_schema))
 
-    case Keyword.get(raw_options, :enable) do
-      false -> %{enable: false}
-      _ -> validate!(raw_options)
+    convenience_options =
+      Application.get_all_env(:log_hog) |> Keyword.take(Keyword.keys(@convenience_schema))
+
+    with %{enable: true} = conv <-
+           convenience_options
+           |> NimbleOptions.validate!(@compiled_convenience_schema)
+           |> Map.new() do
+      config = validate!(configuration_options)
+      {conv, config}
     end
   end
 
   @doc """
-  See `validate/1`
+  See `validate/1`.
   """
-  @spec validate!(options :: keyword() | map()) :: config()
+  @spec validate!(options()) :: config()
   def validate!(options) do
     {:ok, config} = validate(options)
     config
   end
 
   @doc """
-  Validates configuration against the schema
+  Validates configuration against the schema.
   """
-  @spec validate(options :: keyword() | map()) ::
+  @spec validate(options()) ::
           {:ok, config()} | {:error, NimbleOptions.ValidationError.t()}
-  def validate(raw_options) do
-    with {:ok, validated} <- NimbleOptions.validate(raw_options, @compiled_schema) do
+  def validate(options) do
+    with {:ok, validated} <- NimbleOptions.validate(options, @compiled_configuration_schema) do
       config = Map.new(validated)
       client = config.api_client_module.client(config.api_key, config.public_url)
 
@@ -98,7 +127,7 @@ defmodule LogHog.Config do
           :in_app_modules,
           config.in_app_otp_apps |> Enum.flat_map(&Application.spec(&1, :modules)) |> MapSet.new()
         )
-        |> Map.put(:global_context, %{
+        |> Map.put(:global_properties, %{
           "$lib": "LogHog",
           "$lib_version": Application.spec(:log_hog, :vsn) |> to_string()
         })

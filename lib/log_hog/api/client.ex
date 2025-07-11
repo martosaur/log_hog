@@ -1,6 +1,20 @@
 defmodule LogHog.API.Client do
   @moduledoc """
-  Behaviour and the default implementation of a PostHog API Client. Uses `Req`.
+  Behaviour and the default implementation of a PostHog API client. Uses `Req`.
+
+  Users are unlikely to interact with this module directly, but here's an
+  example just in case:
+
+  ## Example
+    
+      > client = LogHog.API.Client.client("phc_abcdedfgh", "https://us.i.posthog.com")
+      %LogHog.API.Client{
+        client: %Req.Request{...},
+        module: LogHog.API.Client
+      }
+      
+      > client.module.request(client.client, :post, "/flags", json: %{distinct_id: "user123"}, params: %{v: 2, config: true})
+      {:ok, %Req.Response{status: 200, body: %{...}}}
   """
   @behaviour __MODULE__
 
@@ -10,10 +24,24 @@ defmodule LogHog.API.Client do
           client: client(),
           module: atom()
         }
+  @typedoc """
+  Arbitrary term that is passed as the first argument to the `c:request/4` callback.
+
+  For the default client, this is a `t:Req.Request.t/0` struct.
+  """
   @type client() :: any()
   @type response() :: {:ok, %{status: non_neg_integer(), body: any()}} | {:error, Exception.t()}
 
+  @doc """
+  Creates a struct that encapsulates all information required for making requests to PostHog's public endpoints.
+  """
   @callback client(api_key :: String.t(), cloud :: String.t()) :: t()
+
+  @doc """
+  Sends an API request.
+
+  Things such as the API token are expected to be baked into the `client` argument.
+  """
   @callback request(client :: client(), method :: atom(), url :: String.t(), opts :: keyword()) ::
               response()
 

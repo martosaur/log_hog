@@ -1,35 +1,45 @@
 defmodule LogHog.Context do
-  @moduledoc """
-  Context is Logger metadata purposefully set to be exported regardless of `LogHog.Config`'s `metadata` setting.
-  """
-
-  @type t() :: map()
+  @moduledoc false
 
   @logger_metadata_key :__loghog__
 
-  @doc """
-  Set context for the current process.
-  """
-  @spec set(t()) :: :ok
-  def set(new_context) do
-    context =
-      case :logger.get_process_metadata() do
-        %{@logger_metadata_key => existing} -> Map.merge(existing, new_context)
-        _ -> new_context
+  def set(name_scope, event_scope \\ :all, context) do
+    metadata =
+      with :undefined <- :logger.get_process_metadata(), do: %{}
+
+    current_context = Map.get(metadata, @logger_metadata_key, %{})
+
+    new_value =
+      case get_in(current_context, [name_scope, event_scope]) do
+        %{} = existing -> Map.merge(existing, context)
+        nil -> context
       end
 
-    :logger.update_process_metadata(%{@logger_metadata_key => context})
+    updated_context =
+      put_in(
+        current_context,
+        [Access.key(name_scope, %{}), Access.key(event_scope, %{})],
+        new_value
+      )
+
+    :logger.update_process_metadata(%{@logger_metadata_key => updated_context})
   end
 
-  @doc """
-  Obtain the context of the current process.
-  """
-  @spec get() :: t()
-  def get() do
+  def get(name_scope, event_scope \\ :all) do
     case :logger.get_process_metadata() do
-      %{@logger_metadata_key => config} -> config
-      %{} -> %{}
-      :undefined -> %{}
+      %{@logger_metadata_key => context} ->
+        get_in(context, [key_and_all(name_scope), key_and_all(event_scope)]) |> Map.new()
+
+      _ ->
+        %{}
+    end
+  end
+
+  defp key_and_all(key) do
+    fn :get, data, next ->
+      scoped = Map.get(data, key, %{})
+      all = Map.get(data, :all, %{})
+      Enum.flat_map([all, scoped], next)
     end
   end
 end
